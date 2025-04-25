@@ -7,7 +7,9 @@ import java.util.Map;
 import java.util.ArrayList;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 
 import java.net.URISyntaxException;
@@ -20,6 +22,7 @@ import com.gym.fit_power.dto.response.RoutineResponseDto;
 import com.gym.fit_power.dto.ClientDTO;
 import com.gym.fit_power.service.impl.*;
 import com.gym.fit_power.dto.NutritionDiaryDTO;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import static com.gym.fit_power.constant.ClientConstants.*;
@@ -27,6 +30,8 @@ import static com.gym.fit_power.constant.ClientConstants.*;
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/clients")
+@RequiredArgsConstructor
+@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 public class ClientController {
 
     private final ClientServiceImpl clientService;
@@ -35,6 +40,7 @@ public class ClientController {
     private final TrainingDiaryServiceImpl trainingDiaryService;
     private final NutritionDiaryServiceImpl nutritionDiaryService;
 
+    @Autowired
     public ClientController(ClientServiceImpl clientService,
                             NutriPlanServiceImpl nutritionPlanService,
                             NutritionDiaryServiceImpl nutritionDiaryService,
@@ -49,7 +55,7 @@ public class ClientController {
 
     // <<<<<<<<<<<<<<<<<<< CLIENTS >>>>>>>>>>>>>>>>>>> //
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<ClientDTO> create(@RequestBody ClientDTO request) throws URISyntaxException {
         log.info("Creating new client: " + "{}", request);
         ClientDTO response = clientService.create(request);

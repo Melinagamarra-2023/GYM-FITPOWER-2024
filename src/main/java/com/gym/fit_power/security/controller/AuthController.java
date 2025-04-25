@@ -11,20 +11,23 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
-@RequestMapping("auth")
+@RequestMapping("api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    private final AuthService authService;
+    private final AuthService service;
 
-    @PostMapping(value = "login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request){
-        return ResponseEntity.ok(authService.login(request));
+    @PostMapping("register")
+    public ResponseEntity<?> register(@RequestBody RegisterRequest registerRequest) {
+        service.register(registerRequest);
+        return ResponseEntity.ok(Map.of("message", "User registered successfully!"));
     }
 
-    @PostMapping(value = "register")
-    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request){
-        return ResponseEntity.ok(authService.register(request));
+    @PostMapping("login")
+    public ResponseEntity<AuthResponse> login (@RequestBody LoginRequest loginRequest){
+        return ResponseEntity.ok(service.login(loginRequest));
     }
 
 

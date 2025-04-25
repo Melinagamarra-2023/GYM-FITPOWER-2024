@@ -10,8 +10,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import java.util.Collection;
-import java.util.List;
+
+import java.util.stream.Collectors;
 
 
 @Data
@@ -19,27 +23,40 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "usuario", uniqueConstraints = @UniqueConstraint(columnNames = "cuit"))
+@Table(name = "users")
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-    private String username;
+    private String email;
     private String password;
     private String name;
     private String lastname;
     @Column(nullable = false)
     private String cuit;
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    private String phone;
+
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "users_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles = new HashSet<>();
 
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" +role.getName().name()))
+                .collect(Collectors.toSet());
     }
-
     @Override
+    public String getUsername() {
+        return email;
+    }
+    @Override
+
     public boolean isAccountNonExpired() {
         return true;
     }
