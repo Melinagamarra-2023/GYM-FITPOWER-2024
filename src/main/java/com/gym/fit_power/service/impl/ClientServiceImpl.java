@@ -1,6 +1,5 @@
 package com.gym.fit_power.service.impl;
 
-import com.gym.fit_power.notification.PublishClientEvents;
 import lombok.extern.slf4j.Slf4j;
 import com.gym.fit_power.model.Gym;
 import com.gym.fit_power.model.Client;
@@ -22,13 +21,11 @@ public class ClientServiceImpl implements ClientService {
 
     GymRepository gymRepository;
     ClientRepository clientRepository;
-    PublishClientEvents clientEventPublisher;
 
     public ClientServiceImpl(ClientRepository clientRepository, GymRepository gymRepository,
-                             PublishClientEvents clientEventPublisher) {
+                             KafkaNotificationServiceImpl clientEventPublisher) {
         this.gymRepository = gymRepository;
         this.clientRepository = clientRepository;
-        this.clientEventPublisher = clientEventPublisher;
     }
 
     @Override
@@ -41,7 +38,6 @@ public class ClientServiceImpl implements ClientService {
             Client newClient = toEntity(clientDTO);
             newClient.setEnabled(true);
             Client created = clientRepository.save(newClient);
-            clientEventPublisher.publishCreate(created);
             return toDTO(created);
         } catch (Exception e) {
             log.error("The client {} could not be saved. Error: ", clientDTO.getCuit(), e);
