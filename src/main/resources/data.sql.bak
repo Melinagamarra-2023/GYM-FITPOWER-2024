@@ -1,5 +1,5 @@
 INSERT INTO usuario (username, password, name, lastname, cuit, role) VALUES ('admin', '$2a$10$nkjXuwh1Z5JpdvATkoFmLemrhM1h9FW1hJI//aWVmoTTOCJm4LB8C', 'admin', 'admin', '33672337629', 'ADMIN');
---INSERT INTO usuario (username, password, name, lastname, cuit, role) VALUES ('user', 'user', 'user', 'user', '30889977553', 'USER');
+INSERT INTO usuario (username, password, name, lastname, cuit, role) VALUES ('user', '$2a$10$Onmv6UyGj/0DUEay.wjIX.cyao/IQgsy8r8IqSh05D9C2IAi/yWfK', 'user', 'user', '30889977553', 'USER');
 
 INSERT INTO gyms (address, domain, mail, phone, enabled) VALUES ('Calle 123', 'gimnasio.com', 'gimnasio@example', '1234567890', TRUE);
 INSERT INTO gyms (address, domain, mail, phone, enabled) VALUES ('Calle 456', 'gimnasio2.com', 'gimnasio2@example', '9876543210', TRUE);
@@ -173,3 +173,8 @@ INSERT INTO nutrition_diary (created_at, breakfast, lunch, snacks, dinner, actua
 ('2022-01-07 08:00:00', 'Avena con frutas y semillas de chía', 'Sopa de lentejas con pan integral', 'Zanahoria y hummus', 'Pollo al curry con arroz integral', 74.9, 'Me siento un poco pesado después del almuerzo', 2),
 ('2022-01-07 12:00:00', 'Tortilla de verduras', 'Ensalada de atún con aguacate', 'Frutos secos mixtos', 'Cerdo a la plancha con puré de batata', 75.1, 'Estoy muy satisfecho con mi dieta', 2),
 ('2022-01-08 08:00:00', 'Batido de proteínas con plátano y leche de almendras', 'Ensalada de pollo con quinoa', 'Manzana y almendras', 'Bistec a la plancha con vegetales salteados', 74.7, 'Me siento genial después del entrenamiento', 2);
+
+INSERT INTO roles (name) VALUES ('USER');
+INSERT INTO roles (name) VALUES ('ADMIN');
+INSERT INTO roles (name) VALUES ('TRAINER');
+INSERT INTO roles (name) VALUES ('NUTRITIONIST');

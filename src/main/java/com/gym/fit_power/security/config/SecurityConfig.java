@@ -5,7 +5,9 @@ import com.gym.fit_power.security.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -17,6 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -29,7 +32,8 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
                 .authorizeHttpRequests(authRequest ->
-                        authRequest.requestMatchers("/auth/**").permitAll()
+                        authRequest
+                                .requestMatchers("/api/v1/auth/**").permitAll()
                                 .requestMatchers("/h2-console/**").permitAll()
                                 .anyRequest().authenticated())
                 .sessionManagement(sessionManagement ->
@@ -39,7 +43,5 @@ public class SecurityConfig {
                 .build();
     }
 
-    // Se configuro la autorizacion a lo endpoint, los que empiezan con la ruta "auth" son publicos y de libre acceso.
-    // otros endpoints requieren autenticacion
-    // se dejo el login de sprintSecurity por defecto
+
 }

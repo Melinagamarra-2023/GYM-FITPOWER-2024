@@ -1,6 +1,24 @@
 package com.gym.fit_power.security.model;
 
-public enum Role {
-    ADMIN,
-    USER
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
+@Table(name = "roles")
+public class Role {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+
+    @Enumerated(EnumType.STRING)
+    @Column(unique = true)
+    private ERole name;
 }

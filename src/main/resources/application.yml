@@ -8,3 +8,4 @@ spring:
       enabled: always # permite ver el log como colores
   jpa:
     defer-datasource-initialization: true
+

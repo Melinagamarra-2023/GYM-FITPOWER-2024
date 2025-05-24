@@ -6,15 +6,19 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class RegisterRequest {
-    private String username;
+    private String email;
     private String password;
     private String name;
     private String lastname;
     private String cuit;
+    private String phone;
+    private Set<String> roles;
 
 }
