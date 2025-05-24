@@ -1,6 +1,8 @@
 package com.gym.fit_power.security.service;
 
 
+
+import com.gym.fit_power.security.model.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -37,6 +39,9 @@ public class JwtService {
                 .toList();
 
         extraClaims.put("roles", roles);
+        if (userDetails instanceof User userP) {
+            extraClaims.put("cuit", userP.getCuit());
+        }
 
         return generateToken(extraClaims, userDetails);
     }

@@ -56,7 +56,10 @@ public class ClientController {
     // <<<<<<<<<<<<<<<<<<< CLIENTS >>>>>>>>>>>>>>>>>>> //
 
     @PostMapping("/create")
-    public ResponseEntity<ClientDTO> create(@RequestBody ClientDTO request) throws URISyntaxException {
+    public ResponseEntity<ClientDTO> create(
+            @RequestBody ClientDTO request
+
+    ) throws URISyntaxException {
         log.info("Creating new client: " + "{}", request);
         ClientDTO response = clientService.create(request);
         log.info("the client was created");
@@ -64,8 +67,16 @@ public class ClientController {
                 location(new URI("/api/clients/" + response.getCuit())).body(response);
     }
 
+    @GetMapping(value = "/prueba")
+    public String read(
+            @RequestHeader String authorization) {
+        return authorization;
+    }
+
     @GetMapping(value = "/{cuit}")
-    public ResponseEntity<ClientDTO> readOne(@PathVariable(value = "cuit") String cuit) {
+    public ResponseEntity<ClientDTO> readOne(
+            @PathVariable(value = "cuit") String cuit) {
+
         log.info("Get client with cuit: " + "{}", cuit);
         ClientDTO response = clientService.readByCuit(cuit);
         log.info("Client was successfully found");
