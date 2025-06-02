@@ -13,7 +13,7 @@ import static com.gym.fit_power.constant.NutritinistConstants.CREATE_NUTRIPLAN;
 
 
 @RestController
-@RequestMapping("/NutririonPlan")
+@RequestMapping("api/v1/NutrirtonPlan")
 public class NutritionPlanController {
     private final NutriPlanServiceImpl service;
     protected static final Logger logger = LoggerFactory.getLogger(NutritionPlanController.class);

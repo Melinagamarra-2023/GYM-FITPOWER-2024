@@ -30,11 +30,7 @@ public class User implements UserDetails {
     Long id;
     private String email;
     private String password;
-    private String name;
-    private String lastname;
-    @Column(nullable = false)
     private String cuit;
-    private String phone;
 
 
     @ManyToMany(fetch = FetchType.EAGER)

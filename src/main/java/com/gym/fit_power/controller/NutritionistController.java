@@ -16,8 +16,8 @@ import java.util.List;
 import static com.gym.fit_power.constant.NutritinistConstants.*;
 
 @RestController
-@PreAuthorize("hasRole('ADMIN')")
-@RequestMapping("/Nutritionist")
+@PreAuthorize("hasAnyRole('NUTRITIONIST', 'ADMIN')")
+@RequestMapping("api/v1/Nutritionist")
 public class NutritionistController {
 
     private final NutriService service;
