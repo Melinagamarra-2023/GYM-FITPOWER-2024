@@ -46,11 +46,8 @@ public class AuthService {
                 .collect(Collectors.toSet());
 
         var user = User.builder()
-                .name(registerRequest.getName())
-                .lastname(registerRequest.getLastname())
                 .cuit(registerRequest.getCuit())
                 .email(registerRequest.getEmail())
-                .phone(registerRequest.getPhone())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .roles(roles)
                 .build();
