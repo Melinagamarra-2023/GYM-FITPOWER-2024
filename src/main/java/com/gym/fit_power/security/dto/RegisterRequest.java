@@ -19,6 +19,7 @@ public class RegisterRequest {
     private String lastname;
     private String cuit;
     private String phone;
+    private String assignedGym;
     private Set<String> roles;
 
 }

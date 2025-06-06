@@ -1,17 +1,16 @@
 package com.gym.fit_power.model;
 
-import lombok.Data;
+import lombok.*;
 
 
 import jakarta.persistence.*;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -32,6 +31,10 @@ public class Nutritionist {
     private LocalDate createdAt;
     private Boolean enabled;
 
-
+    @PrePersist
+    private void prePersist() {
+        createdAt = LocalDate.now();
+        enabled = true;
+    }
 
 }

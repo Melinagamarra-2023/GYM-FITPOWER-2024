@@ -12,8 +12,8 @@ VALUES
 
 -- Clientes
 INSERT INTO clients (
-    cuit, assigned_gym_id, name, lastname, email, phone, birth_date, enabled
+    cuit, assigned_gym_id, name, lastname, email, phone, enabled
 )
 VALUES
-('20-11223344-5', 1, 'Carlos', 'Ramírez', 'carlos.ramirez@example.com', '1133445566', '1990-05-15', TRUE),
-('27-55667788-9', 2, 'María', 'López', 'maria.lopez@example.com', '1144556677', '1985-11-03', TRUE);
+('20-11223344-5', 1, 'Carlos', 'Ramírez', 'carlos.ramirez@example.com', '1133445566', TRUE),
+('27-55667788-9', 2, 'María', 'López', 'maria.lopez@example.com', '1144556677', TRUE);
