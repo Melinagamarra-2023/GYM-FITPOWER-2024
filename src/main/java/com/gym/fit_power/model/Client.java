@@ -1,14 +1,14 @@
 package com.gym.fit_power.model;
 
-import lombok.Data;
+import lombok.*;
+
 import java.util.List;
 import java.time.LocalDate;
 import jakarta.persistence.*;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import jakarta.validation.constraints.*;
 
-@Data
+@Getter
+@Setter
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -48,7 +48,6 @@ public class Client {
     @NotBlank
     private String phone;
 
-    @NotNull
     private LocalDate birthDate;
 
     private Boolean enabled;

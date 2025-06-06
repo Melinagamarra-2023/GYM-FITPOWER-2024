@@ -99,7 +99,7 @@ public class ClientServiceImpl implements ClientService {
             oldClient.setLastname(newClient.getLastname());
             oldClient.setEmail(newClient.getEmail());
             oldClient.setPhone(newClient.getPhone());
-            oldClient.setBirthDate(newClient.getBirthDate());
+//            oldClient.setBirthDate(newClient.getBirthDate());
             return toDTO(clientRepository.save(oldClient));
         } catch (Exception e) {
             log.error("The client {} could not be updated. Error: ", clientDTO.getCuit(), e);
@@ -161,8 +161,8 @@ public class ClientServiceImpl implements ClientService {
         entity.setLastname(dto.getLastname());
         entity.setEmail(dto.getEmail());
         entity.setPhone(dto.getPhone());
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        entity.setBirthDate(LocalDate.parse(dto.getBirthDate(), formatter));
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+//        entity.setBirthDate(LocalDate.parse(dto.getBirthDate(), formatter));
         return entity;
     }
 
@@ -175,7 +175,7 @@ public class ClientServiceImpl implements ClientService {
         dto.setLastname(entity.getLastname());
         dto.setEmail(entity.getEmail());
         dto.setPhone(entity.getPhone());
-        dto.setBirthDate(entity.getBirthDate().toString());
+//        dto.setBirthDate(entity.getBirthDate().toString());
         return dto;
     }
 
