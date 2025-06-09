@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 
+import com.gym.fit_power.util.DecodeUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,6 +56,12 @@ public class ClientController {
 
     // <<<<<<<<<<<<<<<<<<< CLIENTS >>>>>>>>>>>>>>>>>>> //
 
+    // Metodo para extraer el cuit de forma directa solo para pruebas
+//    @GetMapping(value = "/prueba")
+//    public String cuitTesting(@RequestHeader String authorization){
+//        return DecodeUtil.extractCuitFromToken(authorization);
+//    }
+
     @PostMapping("/create")
     public ResponseEntity<ClientDTO> create(
             @RequestBody ClientDTO request
@@ -65,12 +72,6 @@ public class ClientController {
         log.info("the client was created");
         return ResponseEntity.ok().headers(newHeader("CREATED")).
                 location(new URI("/api/clients/" + response.getCuit())).body(response);
-    }
-
-    @GetMapping(value = "/prueba")
-    public String read(
-            @RequestHeader String authorization) {
-        return authorization;
     }
 
     @GetMapping(value = "/{cuit}")
@@ -205,5 +206,5 @@ public class ClientController {
     public ResponseEntity<List<NutritionDiaryDTO>> viewActivePlanDiary(@PathVariable(value = "cuit") String clientCuit) {
         return new ResponseEntity<>(nutritionDiaryService.readByClientActivePlan(clientCuit), HttpStatus.OK);
     }
-  
+
 }

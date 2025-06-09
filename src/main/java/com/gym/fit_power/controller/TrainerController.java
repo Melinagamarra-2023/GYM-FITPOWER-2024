@@ -3,6 +3,7 @@ package com.gym.fit_power.controller;
 import com.gym.fit_power.dto.request.TrainerRequestDto;
 import com.gym.fit_power.dto.response.TrainerResponseDto;
 import com.gym.fit_power.service.TrainerService;
+//import com.gym.fit_power.util.DecodeUtil;
 import com.gym.fit_power.util.ResponseUtils;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -14,10 +15,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
+@Validated
 @RestController
 @RequestMapping("api/v1/trainer")
-@Validated
-@Slf4j
 public class TrainerController {
 
     private final TrainerService trainerService;
@@ -25,6 +26,12 @@ public class TrainerController {
     public TrainerController(TrainerService trainerService, ResponseUtils responseUtils) {
         this.trainerService = trainerService;
     }
+
+    // Metodo para extraer el cuit de forma directa solo para pruebas
+//    @GetMapping(value = "/prueba")
+//    public String cuitTesting(@RequestHeader String authorization){
+//        return DecodeUtil.extractCuitFromToken(authorization);
+//    }
 
     @GetMapping
     public ResponseEntity<List<TrainerResponseDto>> findAll() {
