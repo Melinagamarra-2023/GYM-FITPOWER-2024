@@ -14,6 +14,10 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ExerciseSetRequestDto {
 
+    @NotNull(message = "{exerciseId.notNull}")
+    @Pattern(regexp = "^\\d+$", message = "{exerciseId.invalid}")
+    private Long exerciseId;
+
     @NotNull(message = "{reps.notNull}")
     @Min(value = 1, message = "{reps.min.invalid}")
     @Pattern(regexp = "^\\d+$", message = "{reps.invalid}")
@@ -29,12 +33,8 @@ public class ExerciseSetRequestDto {
     @Pattern(regexp = "^\\d+$", message = "{restInMinutes.invalid}")
     private int restInMinutes;
 
-    @NotNull(message = "{routineId.notNull}")
-    @Pattern(regexp = "^\\d+$", message = "{routineId.invalid}")
-    private Long routineId;
-
-    @NotNull(message = "{exerciseId.notNull}")
-    @Pattern(regexp = "^\\d+$", message = "{exerciseId.invalid}")
-    private Long exerciseId;
+//    @NotNull(message = "{routineId.notNull}")
+//    @Pattern(regexp = "^\\d+$", message = "{routineId.invalid}")
+//    private Long routineId;
 
 }

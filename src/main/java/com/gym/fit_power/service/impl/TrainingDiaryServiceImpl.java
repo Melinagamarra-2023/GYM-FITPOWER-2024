@@ -3,20 +3,25 @@ package com.gym.fit_power.service.impl;
 import com.gym.fit_power.dto.request.TrainingDiaryRequestDto;
 import com.gym.fit_power.dto.response.TrainingDiaryResponseDto;
 import com.gym.fit_power.exception.EntityNotFoundException;
+import com.gym.fit_power.model.Client;
 import com.gym.fit_power.model.Routine;
 import com.gym.fit_power.model.TrainingDiary;
 import com.gym.fit_power.repository.ClientRepository;
 import com.gym.fit_power.repository.RoutineRepository;
 import com.gym.fit_power.repository.TrainingDiaryRepository;
+import com.gym.fit_power.service.RoutineService;
 import com.gym.fit_power.service.TrainingDiaryService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TrainingDiaryServiceImpl implements TrainingDiaryService {
@@ -45,6 +50,30 @@ public class TrainingDiaryServiceImpl implements TrainingDiaryService {
     @Override
     public List<TrainingDiaryResponseDto> findByRoutineId(Long routineId) {
         return trainingDiaryRepository.findByRoutineId(routineId)
+                .stream()
+                .map(this::toDto)
+                .toList();
+    }
+
+    @Override
+    public List<TrainingDiaryResponseDto> readByClientActiveRoutine(String clientCuit) {
+        Client client = clientRepository.findByCuit(clientCuit);
+        if (client == null) {
+            log.warn("Cliente con CUIT: {} no encontrado al buscar diarios de rutina activa.", clientCuit);
+            throw new EntityNotFoundException("Cliente con CUIT: " + clientCuit + " no encontrado.");
+            // Alternativamente, si prefieres, podrías registrar un warning y devolver una lista vacía:
+            // return Collections.emptyList();
+        }
+
+        Optional<Routine> activeRoutineOpt = routineRepository.findByClientAndActiveTrue(client);
+
+        if (activeRoutineOpt.isEmpty()) {
+            log.info("No se encontró rutina activa para el cliente con CUIT: {}. Devolviendo lista vacía de diarios.", clientCuit);
+            return Collections.emptyList();
+        }
+
+        Routine activeRoutine = activeRoutineOpt.get();
+        return trainingDiaryRepository.findByRoutineId(activeRoutine.getId())
                 .stream()
                 .map(this::toDto)
                 .toList();

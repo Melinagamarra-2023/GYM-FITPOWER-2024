@@ -23,7 +23,7 @@ public class Client {
     private String cuit;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
+//    @JoinColumn(nullable = false)
     private Gym assignedGym;
 
     @OneToMany(mappedBy = "client")
@@ -44,12 +44,13 @@ public class Client {
     @NotBlank
     private String email;
 
-    @NotNull
+    @Column(name = "phone_number")
     @NotBlank
+    @Pattern(regexp = "^\\d{10}$")
     private String phone;
 
     private LocalDate birthDate;
 
-    private Boolean enabled;
+    private boolean enabled;
 
 }

@@ -1,5 +1,7 @@
 package com.gym.fit_power.model;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 
@@ -27,9 +29,13 @@ public class Nutritionist {
     @Column(unique = true)
     private String cuit;
     private String email;
+
+    @Column(name = "phone_number")
+    @NotBlank
+    @Pattern(regexp = "^\\d{10}$")
     private String phone;
     private LocalDate createdAt;
-    private Boolean enabled;
+    private boolean enabled;
 
     @PrePersist
     private void prePersist() {
