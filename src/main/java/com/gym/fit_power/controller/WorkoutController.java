@@ -55,7 +55,7 @@ public class WorkoutController {
     // <<<<<<<<<<<<<<<< TRAINING-DIARY >>>>>>>>>>>>>>>> //
 
     // El cliente agrega un diario de entrenamiento
-    @PostMapping("/routine/diary")
+    @PostMapping("/training")
     @PreAuthorize("hasAnyRole('USER')")
     public ResponseEntity<TrainingDiaryResponseDto> addTrainingDiaryForAClient(@Valid @RequestBody TrainingDiaryRequestDto request,
                                                                                @RequestHeader String authorization) {
@@ -63,17 +63,20 @@ public class WorkoutController {
         return new ResponseEntity<>(trainingDiaryService.add(request, clientCuit),HttpStatus.CREATED);
     }
 
-    // El cliente revisa un diario de entrenamiento
-    @GetMapping("/routine/diary/{routineId}")
-    public ResponseEntity<List<TrainingDiaryResponseDto>> viewTrainingDiaryOfAClientRoutine(@PathVariable Long routineId){
-        return new ResponseEntity<>(trainingDiaryService.findByRoutineId(routineId), HttpStatus.OK);
-    }
-
-    // El cliente revisa el diario de entrenamiento de la rutina activa
-    @GetMapping("/routine/diary/active")
-    public ResponseEntity<List<TrainingDiaryResponseDto>> viewActiveTrainingDiary(@RequestHeader String authorization) {
+    // El cliente revisa su diario de entrenamiento
+    @GetMapping("/training")
+    @PreAuthorize("hasAnyRole('USER')")
+    public ResponseEntity<List<TrainingDiaryResponseDto>> viewTrainingDiaryOfAClientRoutine(@RequestHeader String authorization){
         String clientCuit = DecodeUtil.extractCuitFromToken(authorization);
         return new ResponseEntity<>(trainingDiaryService.readByClientActiveRoutine(clientCuit), HttpStatus.OK);
+    }
+
+    // El cliente revisa su rutina activa
+    @GetMapping("/routine")
+    @PreAuthorize("hasAnyRole('USER')")
+    public ResponseEntity<RoutineResponseDto> viewClientActiveRoutine(@RequestHeader String authorization){
+        String clientCuit = DecodeUtil.extractCuitFromToken(authorization);
+        return new ResponseEntity<>(routineService.findClientActiveRoutine(clientCuit), HttpStatus.OK);
     }
 
 }
