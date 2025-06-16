@@ -2,7 +2,8 @@
 import { createRouter, createWebHistory } from "vue-router";
 // Importa las vistas y componentes que se usarán en las rutas
 import LoginView from "../views/LoginView.vue";
-import DashPrincipal from "../components/DashPrincipal.vue";
+import DashPrincipal from "../views/DashPrincipal.vue";
+import RegisterUser from "../views/RegisterUser.vue"; // <-- Agregado
 // Importa el store de autenticación
 import { useAuthStore } from "../store/auth";
 
@@ -10,6 +11,7 @@ import { useAuthStore } from "../store/auth";
 const routes = [
   { path: "/", redirect: "/login" }, // Redirige la raíz al login
   { path: "/login", component: LoginView }, // Ruta para la vista de login
+  { path: "/register", component: RegisterUser }, // <-- Ruta para registro
   {
     path: "/dashboard",
     component: DashPrincipal,
