@@ -6,6 +6,11 @@ import { createPinia } from "pinia";
 import App from "./App.vue";
 // Importa el enrutador de la aplicación
 import router from "./router";
+// Importa los estilos de Bootstrap y su JavaScript
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap";
+// Importa los iconos de Bootstrap
+import "bootstrap-icons/font/bootstrap-icons.css";
 
 // Crea una nueva instancia de la aplicación Vue usando el componente principal
 const app = createApp(App);
