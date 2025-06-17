@@ -2,96 +2,198 @@
   <div class="register-user">
     <div class="register-wrapper">
       <div class="card p-4 shadow-lg border-0">
-        <h2 class="mb-4 text-center text-primary fw-bold">
-          Registro de Usuario
-        </h2>
-        <form @submit.prevent="registerUser">
+        <div class="text-center mb-4">
+          <img
+            src="@/assets/logo.png"
+            alt="Logo"
+            class="logo mb-3"
+            v-if="logo"
+          />
+          <h2 class="text-primary fw-bold">Registro de Usuario</h2>
+          <p class="text-muted">Complete sus datos para registrarse</p>
+        </div>
+
+        <form @submit.prevent="registerUser" novalidate>
+          <!-- Email -->
           <div class="mb-3">
-            <label class="form-label">Email:</label>
+            <label for="email" class="form-label">Email:</label>
             <input
-              v-model="form.email"
+              id="email"
+              v-model.trim="form.email"
               type="email"
               class="form-control"
+              :class="{ 'is-invalid': errors.email }"
               required
               placeholder="ejemplo@email.com"
+              @blur="validateEmail"
             />
+            <div class="invalid-feedback">{{ errors.email }}</div>
           </div>
+
+          <!-- Contraseña -->
           <div class="mb-3">
-            <label class="form-label">Contraseña:</label>
-            <input
-              v-model="form.password"
-              type="password"
-              class="form-control"
-              required
-              placeholder="********"
-            />
+            <label for="password" class="form-label">Contraseña:</label>
+            <div class="input-group">
+              <input
+                id="password"
+                v-model.trim="form.password"
+                :type="showPassword ? 'text' : 'password'"
+                class="form-control"
+                :class="{ 'is-invalid': errors.password }"
+                required
+                placeholder="Mínimo 8 caracteres"
+                @input="validatePassword"
+              />
+              <button
+                class="btn btn-outline-secondary"
+                type="button"
+                @click="showPassword = !showPassword"
+              >
+                <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+              </button>
+            </div>
+            <div class="invalid-feedback">{{ errors.password }}</div>
+            <div class="password-strength mt-1">
+              <div class="strength-bar" :class="passwordStrengthClass"></div>
+              <small class="text-muted">{{ passwordStrengthText }}</small>
+            </div>
           </div>
+
+          <!-- Nombre y Apellido -->
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="name" class="form-label">Nombre:</label>
+              <input
+                id="name"
+                v-model.trim="form.name"
+                type="text"
+                class="form-control"
+                :class="{ 'is-invalid': errors.name }"
+                required
+                placeholder="Nombre"
+                @blur="validateName"
+              />
+              <div class="invalid-feedback">{{ errors.name }}</div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="lastname" class="form-label">Apellido:</label>
+              <input
+                id="lastname"
+                v-model.trim="form.lastname"
+                type="text"
+                class="form-control"
+                :class="{ 'is-invalid': errors.lastname }"
+                required
+                placeholder="Apellido"
+                @blur="validateLastname"
+              />
+              <div class="invalid-feedback">{{ errors.lastname }}</div>
+            </div>
+          </div>
+
+          <!-- CUIT -->
           <div class="mb-3">
-            <label class="form-label">Nombre:</label>
+            <label for="cuit" class="form-label">CUIT:</label>
             <input
-              v-model="form.name"
+              id="cuit"
+              v-model.trim="form.cuit"
               type="text"
               class="form-control"
-              required
-              placeholder="Nombre"
-            />
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Apellido:</label>
-            <input
-              v-model="form.lastname"
-              type="text"
-              class="form-control"
-              required
-              placeholder="Apellido"
-            />
-          </div>
-          <div class="mb-3">
-            <label class="form-label">CUIT:</label>
-            <input
-              v-model="form.cuit"
-              type="text"
-              class="form-control"
+              :class="{ 'is-invalid': errors.cuit }"
               required
               placeholder="20-12345678-9"
+              @input="formatCuit"
+              @blur="validateCuit"
             />
+            <div class="invalid-feedback">{{ errors.cuit }}</div>
           </div>
+
+          <!-- Teléfono -->
           <div class="mb-3">
-            <label class="form-label">Teléfono:</label>
+            <label for="phone" class="form-label">Teléfono:</label>
             <input
-              v-model="form.phone"
-              type="text"
+              id="phone"
+              v-model.trim="form.phone"
+              type="tel"
               class="form-control"
+              :class="{ 'is-invalid': errors.phone }"
               required
-              placeholder="11 1234-5678"
+              placeholder="3764 34-5678"
+              @input="formatPhone"
+              @blur="validatePhone"
             />
+            <div class="invalid-feedback">{{ errors.phone }}</div>
           </div>
-          <div class="mb-3">
+
+          <!-- Roles -->
+          <div class="mb-4">
             <label class="form-label">Rol:</label>
-            <select v-model="form.roles" multiple class="form-select" required>
-              <option value="ADMIN">ADMIN</option>
-              <option value="USER">USER</option>
-            </select>
-            <small class="text-muted">Ctrl+Click para seleccionar varios</small>
+            <div class="roles-container">
+              <div
+                v-for="role in availableRoles"
+                :key="role.value"
+                class="form-check form-check-inline"
+              >
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  :id="`role-${role.value}`"
+                  :value="role.value"
+                  v-model="form.roles"
+                />
+                <label class="form-check-label" :for="`role-${role.value}`">
+                  {{ role.label }}
+                </label>
+              </div>
+            </div>
+            <small v-if="errors.roles" class="text-danger">{{
+              errors.roles
+            }}</small>
           </div>
-          <button type="submit" class="btn btn-gradient w-100 py-2 fw-bold">
-            Registrar
+
+          <button
+            type="submit"
+            class="btn btn-gradient w-100 py-2 fw-bold"
+            :disabled="isSubmitting"
+          >
+            <span v-if="isSubmitting">
+              <span
+                class="spinner-border spinner-border-sm"
+                role="status"
+                aria-hidden="true"
+              ></span>
+              Procesando...
+            </span>
+            <span v-else>Registrarse</span>
           </button>
+
+          <div class="text-center mt-3">
+            <p>
+              ¿Ya tienes una cuenta?
+              <router-link to="/login">Inicia sesión</router-link>
+            </p>
+          </div>
         </form>
-        <div
-          v-if="message"
-          class="alert mt-3"
-          :class="{
-            'alert-success': message.includes('exitosamente'),
-            'alert-danger': !message.includes('exitosamente'),
-          }"
-        >
-          {{ message }}
-        </div>
+
+        <!-- Mensajes de feedback -->
+        <transition name="fade">
+          <div
+            v-if="message"
+            class="alert mt-3 mb-0"
+            :class="{
+              'alert-success': messageType === 'success',
+              'alert-danger': messageType === 'error',
+            }"
+          >
+            <div class="d-flex align-items-center">
+              <i :class="messageIcon" class="me-2"></i>
+              <span>{{ message }}</span>
+            </div>
+          </div>
+        </transition>
       </div>
     </div>
   </div>
-  
 </template>
 
 <script>
@@ -108,25 +210,73 @@ export default {
         phone: "",
         roles: [],
       },
+      errors: {
+        email: "",
+        password: "",
+        name: "",
+        lastname: "",
+        cuit: "",
+        phone: "",
+        roles: "",
+      },
+      availableRoles: [
+        { value: "ADMIN", label: "Administrador" },
+        { value: "USER", label: "Usuario" },
+      ],
+      termsAccepted: false,
+      showPassword: false,
+      isSubmitting: false,
       message: "",
+      messageType: "",
+      logo: true,
     };
   },
-  methods: {
-    async checkUserExists(field, value) {
-      try {
-        const response = await fetch(
-          `http://localhost:8080/api/v1/auth/check?${field}=${value}`
-        );
-        return response.ok;
-      } catch (error) {
-        console.error("Error verificando usuario:", error);
-        return false;
-      }
-    },
+  computed: {
+    passwordStrength() {
+      if (!this.form.password) return 0;
 
+      let strength = 0;
+
+      // Longitud mínima
+      if (this.form.password.length >= 8) strength += 1;
+
+      // Contiene números
+      if (/\d/.test(this.form.password)) strength += 1;
+
+      // Contiene mayúsculas
+      if (/[A-Z]/.test(this.form.password)) strength += 1;
+
+      // Contiene caracteres especiales
+      if (/[^A-Za-z0-9]/.test(this.form.password)) strength += 1;
+
+      return strength;
+    },
+    passwordStrengthClass() {
+      return [
+        "strength-" + this.passwordStrength,
+        { "bg-danger": this.passwordStrength <= 1 },
+        { "bg-warning": this.passwordStrength === 2 },
+        { "bg-info": this.passwordStrength === 3 },
+        { "bg-success": this.passwordStrength >= 4 },
+      ];
+    },
+    passwordStrengthText() {
+      const texts = ["Muy débil", "Débil", "Moderada", "Fuerte", "Muy fuerte"];
+      return texts[this.passwordStrength];
+    },
+    messageIcon() {
+      return this.messageType === "success"
+        ? "bi bi-check-circle-fill"
+        : "bi bi-exclamation-triangle-fill";
+    },
+  },
+  methods: {
     async registerUser() {
+      if (!this.validateForm()) return;
+
       try {
-        this.message = ""; // Limpiar mensaje anterior
+        this.isSubmitting = true;
+        this.message = "";
 
         const response = await fetch(
           "http://localhost:8080/api/v1/auth/register",
@@ -142,28 +292,169 @@ export default {
         const data = await response.json();
 
         if (!response.ok) {
-          // Manejar errores específicos del backend
-          if (data.message.includes("CUIT") || data.message.includes("email")) {
-            throw new Error(data.message);
-          }
           throw new Error(data.message || "Error en el registro");
         }
 
-        this.message = "Usuario registrado exitosamente";
-        // Resetear formulario
-        this.form = {
-          email: "",
-          password: "",
-          name: "",
-          lastname: "",
-          cuit: "",
-          phone: "",
-          roles: [],
-        };
+        this.showMessage("Usuario registrado exitosamente", "success");
+        this.resetForm();
+
+        // Redirigir después de 2 segundos
+        setTimeout(() => {
+          this.$router.push("/login");
+        }, 7000);
       } catch (error) {
-        this.message = error.message;
+        this.showMessage(error.message, "error");
         console.error("Error de registro:", error);
+      } finally {
+        this.isSubmitting = false;
       }
+    },
+
+    validateForm() {
+      this.validateEmail();
+      this.validatePassword();
+      this.validateName();
+      this.validateLastname();
+      this.validateCuit();
+      this.validatePhone();
+      this.validateRoles();
+
+      return !Object.values(this.errors).some((error) => error !== "");
+    },
+
+    validateEmail() {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!this.form.email) {
+        this.errors.email = "El email es requerido";
+      } else if (!emailRegex.test(this.form.email)) {
+        this.errors.email = "Por favor ingrese un email válido";
+      } else {
+        this.errors.email = "";
+      }
+    },
+
+    validatePassword() {
+      if (!this.form.password) {
+        this.errors.password = "La contraseña es requerida";
+      } else if (this.form.password.length < 8) {
+        this.errors.password = "La contraseña debe tener al menos 8 caracteres";
+      } else {
+        this.errors.password = "";
+      }
+    },
+
+    validateName() {
+      if (!this.form.name) {
+        this.errors.name = "El nombre es requerido";
+      } else if (this.form.name.length < 2) {
+        this.errors.name = "El nombre debe tener al menos 2 caracteres";
+      } else {
+        this.errors.name = "";
+      }
+    },
+
+    validateLastname() {
+      if (!this.form.lastname) {
+        this.errors.lastname = "El apellido es requerido";
+      } else if (this.form.lastname.length < 2) {
+        this.errors.lastname = "El apellido debe tener al menos 2 caracteres";
+      } else {
+        this.errors.lastname = "";
+      }
+    },
+
+    validateCuit() {
+      const cuitRegex = /^(20|23|27|30|33)([0-9]{9}|-[0-9]{8}-[0-9]{1})$/;
+      if (!this.form.cuit) {
+        this.errors.cuit = "El CUIT es requerido";
+      } else if (!cuitRegex.test(this.form.cuit)) {
+        this.errors.cuit = "Por favor ingrese un CUIT válido";
+      } else {
+        this.errors.cuit = "";
+      }
+    },
+
+    validatePhone() {
+      const phoneRegex = /^(\d{2,4}[-\s]?){2}\d{4}$/;
+      if (!this.form.phone) {
+        this.errors.phone = "El teléfono es requerido";
+      } else if (!phoneRegex.test(this.form.phone)) {
+        this.errors.phone = "Por favor ingrese un teléfono válido";
+      } else {
+        this.errors.phone = "";
+      }
+    },
+
+    validateRoles() {
+      if (this.form.roles.length === 0) {
+        this.errors.roles = "Debe seleccionar al menos un rol";
+      } else {
+        this.errors.roles = "";
+      }
+    },
+
+    formatCuit() {
+      // Eliminar todo lo que no sea número
+      let value = this.form.cuit.replace(/\D/g, "");
+
+      // Aplicar formato XX-XXXXXXXX-X
+      if (value.length > 2) {
+        value = value.substring(0, 2) + "-" + value.substring(2);
+      }
+      if (value.length > 11) {
+        value = value.substring(0, 11) + "-" + value.substring(11, 12);
+      }
+
+      this.form.cuit = value;
+    },
+
+    formatPhone() {
+      // Eliminar todo lo que no sea número
+      let value = this.form.phone.replace(/\D/g, "");
+
+      // Aplicar formato XX XXXX-XXXX
+      if (value.length > 2) {
+        value = value.substring(0, 2) + " " + value.substring(2);
+      }
+      if (value.length > 7) {
+        value = value.substring(0, 7) + "-" + value.substring(7);
+      }
+
+      this.form.phone = value.substring(0, 12); // Limitar a 11 dígitos
+    },
+
+    showMessage(message, type) {
+      this.message = message;
+      this.messageType = type;
+
+      // Auto-ocultar mensaje después de 5 segundos
+      setTimeout(() => {
+        if (this.message === message) {
+          this.message = "";
+        }
+      }, 5000);
+    },
+
+    resetForm() {
+      this.form = {
+        email: "",
+        password: "",
+        name: "",
+        lastname: "",
+        cuit: "",
+        phone: "",
+        roles: [],
+      };
+      this.termsAccepted = false;
+      this.errors = {
+        email: "",
+        password: "",
+        name: "",
+        lastname: "",
+        cuit: "",
+        phone: "",
+        roles: "",
+      };
     },
   },
 };
@@ -172,45 +463,121 @@ export default {
 <style scoped>
 .register-user {
   min-height: 100vh;
-  background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
+  padding: 2rem 0;
 }
+
 .register-wrapper {
   width: 100%;
-  max-width: 420px;
-  margin: 32px auto;
-  padding: 16px;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 0 16px;
   box-sizing: border-box;
 }
+
 .card {
-  border-radius: 1.5rem;
+  border-radius: 1rem;
   background: #fff;
   padding: 2rem !important;
-  box-sizing: border-box;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
+
+.logo {
+  max-height: 60px;
+}
+
 .btn-gradient {
-  background: linear-gradient(90deg, #007bff 0%, #00c6ff 100%);
+  background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
   color: #fff;
   border: none;
-  transition: background 0.3s;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
+
 .btn-gradient:hover {
-  background: linear-gradient(90deg, #0056b3 0%, #007bff 100%);
-  color: #fff;
+  background: linear-gradient(90deg, #3a56a0 0%, #121d3a 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
-@media (max-width: 575.98px) {
-  .register-wrapper {
-    max-width: 100%;
-    padding: 0;
-    margin: 0;
+
+.btn-gradient:disabled {
+  background: #cccccc;
+  transform: none;
+  box-shadow: none;
+}
+
+.password-strength {
+  width: 100%;
+}
+
+.strength-bar {
+  height: 4px;
+  width: 100%;
+  border-radius: 2px;
+  margin-bottom: 2px;
+  transition: all 0.3s ease;
+}
+
+.strength-0 {
+  width: 20%;
+  background-color: #dc3545;
+}
+
+.strength-1 {
+  width: 40%;
+  background-color: #fd7e14;
+}
+
+.strength-2 {
+  width: 60%;
+  background-color: #ffc107;
+}
+
+.strength-3 {
+  width: 80%;
+  background-color: #17a2b8;
+}
+
+.strength-4 {
+  width: 100%;
+  background-color: #28a745;
+}
+
+.roles-container {
+  background: #f8f9fa;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.form-check-inline {
+  margin-right: 1.5rem;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
+@media (max-width: 767.98px) {
+  .register-user {
+    padding: 1rem;
   }
+
   .card {
-    border-radius: 0;
-    padding: 1rem !important;
-    box-shadow: none;
+    padding: 1.5rem !important;
+  }
+
+  .logo {
+    max-height: 50px;
   }
 }
 </style>
