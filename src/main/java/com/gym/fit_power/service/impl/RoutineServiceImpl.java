@@ -28,39 +28,38 @@ public class RoutineServiceImpl implements RoutineService {
     private final TrainingDiaryServiceImpl trainingDiaryServiceImpl;
 
     @Override
-    public RoutineResponseDto save(RoutineRequestDto routineRequestDto, String clientCuit) {
-        var trainerCuit = routineRequestDto.getTrainerCuit();
-        Optional<Trainer> trainer = trainerRepository.findByCuit(trainerCuit);
-        if (trainer.isEmpty()) {
-            throw new EntityNotFoundException("Trainer with CUIT " + trainerCuit + " not found.");
-        }
-        Optional<Client> client = clientRepository.findAll()
-                .stream()
-                .filter(c -> c.getCuit().equals(clientCuit))
-                .findFirst();
-        if (client.isEmpty()) {
+    public RoutineResponseDto save(RoutineRequestDto routineRequestDto, String trainerCuit) {
+        Optional<Trainer> trainerOpt = trainerRepository.findByCuit(trainerCuit);
+        Trainer trainer = trainerOpt.orElseThrow(() ->
+                new EntityNotFoundException("Trainer with CUIT " + trainerCuit + " not found."));
+        String clientCuit = routineRequestDto.getClientCuit();
+        Client client = clientRepository.findByCuit(clientCuit);
+        if (client == null) {
             throw new EntityNotFoundException("Client with CUIT " + clientCuit + " not found.");
         }
-        Routine routine = this.toEntity(routineRequestDto);
-        routine.setTrainer(trainer.get());
-        routine.setClient(client.get());
+        Routine newRoutine = this.toEntity(routineRequestDto);
+        newRoutine.setTrainer(trainer);
+        newRoutine.setClient(client);
 
         List<ExerciseSetRequestDto> exerciseSetRequestDtos = routineRequestDto.getExerciseSets();
         List<ExerciseSet> exerciseSets = new ArrayList<>();
-        for (ExerciseSetRequestDto exerciseSetRequestDto : exerciseSetRequestDtos) {
-            Exercise exercise = exerciseRepository.findById(exerciseSetRequestDto.getExerciseId())
-                    .orElseThrow(() -> new RuntimeException("Exercise not found"));
-            ExerciseSet exerciseSet = exerciseSetServiceImpl.toEntity(exerciseSetRequestDto, routine, exercise);
-            exerciseSets.add(exerciseSet);
+        if (exerciseSetRequestDtos != null) {
+            for (ExerciseSetRequestDto exerciseSetRequestDto : exerciseSetRequestDtos) {
+                Exercise exercise = exerciseRepository.findById(exerciseSetRequestDto.getExerciseId())
+                        .orElseThrow(() -> new EntityNotFoundException("Exercise with ID " + exerciseSetRequestDto.getExerciseId() + " not found")); // Usa EntityNotFoundException
+                ExerciseSet exerciseSet = exerciseSetServiceImpl.toEntity(exerciseSetRequestDto, newRoutine, exercise);
+                exerciseSets.add(exerciseSet);
+            }
         }
-        routine.setExerciseSets(exerciseSets);
+
+        newRoutine.setExerciseSets(exerciseSets);
 
         RoutineResponseDto activeRoutineDto = findClientActiveRoutine(clientCuit);
         if (activeRoutineDto != null) {
             disableActiveRoutine(activeRoutineDto.getId());
         }
 
-        Routine savedRoutine = routineRepository.save(routine);
+        Routine savedRoutine = routineRepository.save(newRoutine);
         return this.toDto(savedRoutine);
     }
 
@@ -81,18 +80,12 @@ public class RoutineServiceImpl implements RoutineService {
 
     @Override
     public RoutineResponseDto findClientActiveRoutine(String clientCuit) {
-        Optional<Client> client = clientRepository.findAll()
-                .stream()
-                .filter(c -> c.getCuit().equals(clientCuit))
-                .findFirst();
-        if (client.isEmpty()) {
+        Client client = clientRepository.findByCuit(clientCuit);
+        if (client == null) {
             throw new EntityNotFoundException("Client with CUIT " + clientCuit + " not found.");
         }
-        Optional<Routine> routine = routineRepository.findByClientAndActiveTrue(client.get());
-        if (routine.isEmpty()) {
-            throw new EntityNotFoundException("Routine not found.");
-        }
-        return this.toDto(routine.get());
+        Optional<Routine> routineOpt = routineRepository.findByClientAndActiveTrue(client);
+        return routineOpt.map(this::toDto).orElse(null); // Devuelve el DTO si existe, sino null.
     }
 
     @Override

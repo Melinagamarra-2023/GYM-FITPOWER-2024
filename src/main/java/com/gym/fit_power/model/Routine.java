@@ -49,7 +49,9 @@ public class Routine {
     @PrePersist
     private void prePersist() {
         createdAt = LocalDate.now();
-        active = true;
+        if (this.active == null) {
+            this.active = true;
+        }
     }
 
 }

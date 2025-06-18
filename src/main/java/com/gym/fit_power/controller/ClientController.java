@@ -3,12 +3,8 @@ package com.gym.fit_power.controller;
 import java.net.URI;
 import java.util.List;
 
-import java.util.Map;
 import java.util.ArrayList;
 
-import com.gym.fit_power.util.DecodeUtil;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -16,9 +12,6 @@ import org.springframework.http.*;
 import java.net.URISyntaxException;
 
 import com.gym.fit_power.dto.NutriPlanDTO;
-import com.gym.fit_power.dto.request.RoutineRequestDto;
-import com.gym.fit_power.dto.request.TrainingDiaryRequestDto;
-import com.gym.fit_power.dto.response.RoutineResponseDto;
 
 import com.gym.fit_power.dto.ClientDTO;
 import com.gym.fit_power.service.impl.*;
@@ -31,27 +24,20 @@ import static com.gym.fit_power.constant.ClientConstants.*;
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/clients")
-@RequiredArgsConstructor
 @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 public class ClientController {
 
     private final ClientServiceImpl clientService;
-    private final RoutineServiceImpl routineService;
     private final NutriPlanServiceImpl nutritionPlanService;
-    private final TrainingDiaryServiceImpl trainingDiaryService;
     private final NutritionDiaryServiceImpl nutritionDiaryService;
 
     @Autowired
     public ClientController(ClientServiceImpl clientService,
                             NutriPlanServiceImpl nutritionPlanService,
-                            NutritionDiaryServiceImpl nutritionDiaryService,
-                            RoutineServiceImpl routineService,
-                            TrainingDiaryServiceImpl trainingDiaryService) {
+                            NutritionDiaryServiceImpl nutritionDiaryService) {
         this.clientService = clientService;
-        this.routineService = routineService;
         this.nutritionPlanService = nutritionPlanService;
         this.nutritionDiaryService = nutritionDiaryService;
-        this.trainingDiaryService = trainingDiaryService;
     }
 
     // <<<<<<<<<<<<<<<<<<< CLIENTS >>>>>>>>>>>>>>>>>>> //
@@ -130,47 +116,6 @@ public class ClientController {
         headers.add(headerName, SUCCESSFUL);
         return headers;
     }
-
-    // <<<<<<<<<<<<<<<<<<< ROUTINES >>>>>>>>>>>>>>>>>>>
-
-    @GetMapping("/{cuit}/routines")
-    public ResponseEntity<List<RoutineResponseDto>> viewRoutines(@PathVariable(value = "cuit") String clientCuit) {
-        return new ResponseEntity<>(routineService.findByClient(clientCuit), HttpStatus.OK);
-    }
-
-    @GetMapping("/{cuit}/routine")
-    public ResponseEntity<RoutineResponseDto> viewActiveRoutine(@PathVariable(value = "cuit") String clientCuit) {
-        return new ResponseEntity<>(routineService.findClientActiveRoutine(clientCuit), HttpStatus.OK);
-    }
-
-    @PostMapping("/{cuit}/routine")
-    public ResponseEntity<RoutineResponseDto> createRoutine(@Valid @RequestBody RoutineRequestDto request, @PathVariable(value = "cuit") String clientCuit) {
-        return new ResponseEntity<>(routineService.save(request, clientCuit), HttpStatus.CREATED);
-    }
-
-    // <<<<<<<<<<<<<<<< TRAINING-DIARY >>>>>>>>>>>>>>>> //
-
-    @PostMapping("/{cuit}/routine/diary")
-    public ResponseEntity<Object> addTrainingDiary(@Valid @RequestBody TrainingDiaryRequestDto request, @PathVariable(value = "cuit") String clientCuit) {
-        trainingDiaryService.add(request, clientCuit);
-        return new ResponseEntity<>(Map.of("message", "Diario de rutina agregado exitosamente para el cliente con CUIT " + clientCuit), HttpStatus.CREATED);
-    }
-
-/*
-
-    @GetMapping("/{cuit}/routines/{id}/diary")
-    public ResponseEntity<List<RoutineDiaryDTO>> viewRoutineDiary(@PathVariable(value = "cuit") String clientCuit,
-                                                                      @PathVariable(value = "id") String id) {
-        return new ResponseEntity<>(routineDiaryService.readByRoutine(id), HttpStatus.OK);
-    }
-
-    @GetMapping("/{cuit}/routines/active/diary")
-    public ResponseEntity<List<RoutineDiaryDTO>> viewActiveRoutineDiary(@PathVariable(value = "cuit") String clientCuit) {
-        return new ResponseEntity<>(routineDiaryService.readByClientActiveRoutine(clientCuit), HttpStatus.OK);
-    }
-
-*/
-
 
     @GetMapping("/{cuit}/nutrition_plans")
     public ResponseEntity<List<NutriPlanDTO>> viewNutritionPlans(@PathVariable(value = "cuit") String clientCuit) {

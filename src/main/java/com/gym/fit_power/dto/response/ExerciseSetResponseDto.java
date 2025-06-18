@@ -11,11 +11,10 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ExerciseSetResponseDto {
 
-    private Long id;
+//    private Long id;
+    private String exerciseName;
     private int reps;
     private int sets;
     private int restInMinutes;
-    private Long routineId;
-    private Long exerciseId;
 
 }

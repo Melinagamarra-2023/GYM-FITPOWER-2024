@@ -67,23 +67,22 @@ public class ExerciseSetServiceImpl implements ExerciseSetService {
 
     public ExerciseSetResponseDto toDto(ExerciseSet exerciseSet) {
         return ExerciseSetResponseDto.builder()
-                .id(exerciseSet.getId())
+//                .id(exerciseSet.getId())
+                .exerciseName(exerciseSet.getExercise().getName())
                 .reps(exerciseSet.getReps())
                 .sets(exerciseSet.getSets())
                 .restInMinutes(exerciseSet.getRestInMinutes())
-                .routineId(exerciseSet.getRoutine().getId())
-                .exerciseId(exerciseSet.getExercise().getId())
                 .build();
     }
 
     public ExerciseSet toEntity(ExerciseSetRequestDto exerciseSetRequestDto, Routine routine, Exercise exercise) {
 
         return ExerciseSet.builder()
+                .routine(routine)
+                .exercise(exercise)
                 .reps(exerciseSetRequestDto.getReps())
                 .sets(exerciseSetRequestDto.getSets())
                 .restInMinutes(exerciseSetRequestDto.getRestInMinutes())
-                .routine(routine)
-                .exercise(exercise)
                 .build();
     }
 

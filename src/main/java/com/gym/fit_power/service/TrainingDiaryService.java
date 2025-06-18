@@ -9,4 +9,5 @@ import java.util.List;
 public interface TrainingDiaryService {
     TrainingDiaryResponseDto add(TrainingDiaryRequestDto trainingDiaryRequestDto, String clientCuit) throws EntityNotFoundException;
     List<TrainingDiaryResponseDto> findByRoutineId(Long routineId);
+    List<TrainingDiaryResponseDto> readByClientActiveRoutine(String clientCuit);
 }

@@ -18,13 +18,13 @@ import java.util.List;
 @Builder
 public class RoutineRequestDto {
 
+    @NotBlank(message = "{trainerCuit.notBlank}")
+    @Size(min = 11, max = 11, message = "{trainerCuit.size.invalid}")
+    private String clientCuit;
+
     @NotBlank(message = "{goals.notBlank}")
     @Size(min = 10, max = 200, message = "{goals.size.invalid}")
     private String goals;
-
-    @NotBlank(message = "{trainerCuit.notBlank}")
-    @Size(min = 11, max = 11, message = "{trainerCuit.size.invalid}")
-    private String trainerCuit;
 
     @NotEmpty(message = "{exerciseSets.notEmpty}")
     private List<ExerciseSetRequestDto> exerciseSets;
