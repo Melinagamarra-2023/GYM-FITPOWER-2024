@@ -4,18 +4,6 @@ spring:
     url: ${DATABASE_URL}
     username: ${LOCAL_DB_USER}
     password: ${LOCAL_DB_PASSWORD}
-#  sql:
-#    init:
-#      mode: always
-  jpa:
-    hibernate:
-      ddl-auto: update
-  jwt:
-    secret: ${SECRET_KEY}
 
 server:
   port: 8081
-
-logging:
-  level:
-    root: info
