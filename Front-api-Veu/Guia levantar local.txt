@@ -1,0 +1,25 @@
+✅ PASOS PARA LEVANTAR UNA APP VUE
+
+1. Verificar la instalación de Node.js y npm
+Antes de comenzar, asegurate de tener instalados Node.js y npm (Node Package Manager). Para comprobarlo, ejecutá los siguientes comandos en la terminal:
+comando: node -v
+comando: npm -v
+Si alguno de los comandos no es reconocido, descargá e instalá Node.js desde el sitio oficial: https://nodejs.org/es
+
+2. Ubicate en el directorio del proyecto
+comando: cd Front-api-Veu/gym-fit_power/
+
+3. Instalá las dependencias
+comando: npm install
+
+4. Una vez finalizada la descargar levantar en el puerto 8082
+comando: npm run serve
+
+5. Para parar el servidor en la consola "CTRL + C"
+
+📌 NOTAS ADICIONALES
+Si al hacer npm install te tira errores relacionados con permisos o conflictos, podés intentar:
+
+comando: rm -rf node_modules package-lock.json
+comando: npm cache clean --force
+comando: npm install

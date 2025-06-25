@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -15,6 +16,11 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 
 @Configuration
@@ -38,6 +44,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
+                .cors(Customizer.withDefaults()) // 👈 esto habilita CORS en Spring Security
                 .csrf(AbstractHttpConfigurer::disable)
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
                 .authorizeHttpRequests(authRequest ->
@@ -53,5 +60,35 @@ public class SecurityConfig {
                 .build();
     }
 
+
+
+    /**
+     * Configura la política de Cross-Origin Resource Sharing (CORS) para la aplicación.
+     * <p>
+     * Este bean define la política de CORS, especificando qué orígenes, métodos HTTP y cabeceras
+     * están permitidos al acceder al backend desde una aplicación frontend.
+     * </p>
+     * <ul>
+     *   <li><b>Orígenes permitidos:</b> Solo se permiten solicitudes desde "http://localhost:8082" (normalmente la URL del frontend).</li>
+     *   <li><b>Métodos permitidos:</b> Se permiten los métodos HTTP "GET", "POST", "PUT", "DELETE" y "OPTIONS".</li>
+     *   <li><b>Cabeceras permitidas:</b> Se permiten todas las cabeceras ("*").</li>
+     *   <li><b>Permitir credenciales:</b> Se permite el envío de credenciales como cookies o cabeceras de autorización.</li>
+     * </ul>
+     * La configuración se registra para todos los endpoints ("/**").
+     *
+     * @return un {@link CorsConfigurationSource} con la configuración CORS especificada
+     */
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:8082")); // Frontend URL
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 
 }
