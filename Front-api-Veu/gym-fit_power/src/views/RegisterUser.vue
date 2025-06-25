@@ -178,17 +178,15 @@
         <!-- Mensajes de feedback -->
         <transition name="fade">
           <div
-            v-if="message"
-            class="alert mt-3 mb-0"
+            v-if="showToast"
+            class="custom-toast"
             :class="{
-              'alert-success': messageType === 'success',
-              'alert-danger': messageType === 'error',
+              'toast-success': toastType === 'success',
+              'toast-error': toastType === 'error',
             }"
           >
-            <div class="d-flex align-items-center">
-              <i :class="messageIcon" class="me-2"></i>
-              <span>{{ message }}</span>
-            </div>
+            <i :class="toastIcon" class="me-2"></i>
+            <span>{{ toastMessage }}</span>
           </div>
         </transition>
       </div>
@@ -229,6 +227,9 @@ export default {
       message: "",
       messageType: "",
       logo: true,
+      showToast: false,
+      toastMessage: "",
+      toastType: "",
     };
   },
   computed: {
@@ -269,6 +270,11 @@ export default {
         ? "bi bi-check-circle-fill"
         : "bi bi-exclamation-triangle-fill";
     },
+    toastIcon() {
+      return this.toastType === "success"
+        ? "bi bi-check-circle-fill"
+        : "bi bi-exclamation-triangle-fill";
+    },
   },
   methods: {
     async registerUser() {
@@ -295,7 +301,7 @@ export default {
           throw new Error(data.message || "Error en el registro");
         }
 
-        this.showMessage("Usuario registrado exitosamente", "success");
+        this.showToastMessage("Usuario registrado exitosamente", "success");
         this.resetForm();
 
         // Redirigir después de 2 segundos
@@ -456,6 +462,14 @@ export default {
         roles: "",
       };
     },
+    showToastMessage(message, type = "success") {
+      this.toastMessage = message;
+      this.toastType = type;
+      this.showToast = true;
+      setTimeout(() => {
+        this.showToast = false;
+      }, 3000); // 3 segundos
+    },
   },
 };
 </script>
@@ -579,5 +593,30 @@ export default {
   .logo {
     max-height: 50px;
   }
+}
+.custom-toast {
+  position: fixed;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  min-width: 250px;
+  max-width: 90vw;
+  background: #fff;
+  color: #333;
+  border-radius: 8px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  font-size: 1.1rem;
+  opacity: 0.97;
+  border-left: 6px solid #28a745;
+}
+.toast-success {
+  border-left-color: #28a745;
+}
+.toast-error {
+  border-left-color: #dc3545;
 }
 </style>
