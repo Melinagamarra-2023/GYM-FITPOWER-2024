@@ -14,6 +14,14 @@ module.exports = defineConfig({
       // Configura la URL del WebSocket para el cliente (hot reloading, etc.)
       webSocketURL: "ws://localhost:8082/ws",
     },
+    // Configuración del proxy para redirigir llamadas a la API
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+        secure: false
+      }
+    }
   },
 });
 
