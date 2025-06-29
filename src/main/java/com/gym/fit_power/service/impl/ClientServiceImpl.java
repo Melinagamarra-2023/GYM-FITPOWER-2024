@@ -161,8 +161,9 @@ public class ClientServiceImpl implements ClientService {
         entity.setLastname(dto.getLastname());
         entity.setEmail(dto.getEmail());
         entity.setPhone(dto.getPhone());
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-//        entity.setBirthDate(LocalDate.parse(dto.getBirthDate(), formatter));
+        if (dto.getBirthDate() != null && !dto.getBirthDate().isEmpty()) {
+            entity.setBirthDate(LocalDate.parse(dto.getBirthDate()));
+        }
         return entity;
     }
 
@@ -175,7 +176,7 @@ public class ClientServiceImpl implements ClientService {
         dto.setLastname(entity.getLastname());
         dto.setEmail(entity.getEmail());
         dto.setPhone(entity.getPhone());
-//        dto.setBirthDate(entity.getBirthDate().toString());
+        dto.setBirthDate(entity.getBirthDate() != null ? entity.getBirthDate().toString() : null);
         return dto;
     }
 

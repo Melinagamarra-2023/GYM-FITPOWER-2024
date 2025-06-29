@@ -12,9 +12,9 @@ export const useAuthStore = defineStore("auth", {
         // Acción para iniciar sesión
         async login(email, password) {
             try {
-                // Realiza la petición de login al backend
+                // Realiza la petición de login al backend usando el proxy
                 const res = await axios.post(
-                    "http://localhost:8080/api/v1/auth/login",
+                    "/api/v1/auth/login",
                     {
                         email,
                         password,

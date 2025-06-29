@@ -27,7 +27,7 @@ public class ClientDTO {
         dto.setLastname(entity.getLastname());
         dto.setEmail(entity.getEmail());
         dto.setPhone(entity.getPhone());
-//        dto.setBirthDate(entity.getBirthDate().toString());
+        dto.setBirthDate(entity.getBirthDate() != null ? entity.getBirthDate().toString() : null);
         return dto;
     }
 

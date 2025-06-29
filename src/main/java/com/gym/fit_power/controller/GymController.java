@@ -9,12 +9,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.gym.fit_power.service.impl.GymServiceImpl;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import static com.gym.fit_power.constant.GymConstants.*;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/V1/gyms")
+@PreAuthorize("hasAnyRole('ADMIN')")
 public class GymController {
 
     private final GymServiceImpl service;
@@ -44,6 +46,12 @@ public class GymController {
     public ResponseEntity<List<GymDTO>> readAll() {
         log.info("Get all gyms");
         List<GymDTO> response = service.readAll();
+        
+        if (response == null) {
+            log.error("Failed to retrieve gyms");
+            return ResponseEntity.internalServerError().build();
+        }
+        
         log.info("The gyms were found correctly");
         return ResponseEntity.ok().headers(newHeader("FOUND")).body(response);
     }

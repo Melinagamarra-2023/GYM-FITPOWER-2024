@@ -4,6 +4,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import LoginView from "../views/LoginView.vue";
 import DashPrincipal from "../views/DashPrincipal.vue";
 import RegisterUser from "../views/RegisterUser.vue"; // <-- Agregado
+import CreateClient from "../views/CreateClient.vue"; // <-- Agregado
 // Importa el store de autenticación
 import { useAuthStore } from "../store/auth";
 
@@ -15,6 +16,11 @@ const routes = [
   {
     path: "/dashboard",
     component: DashPrincipal,
+    meta: { requiresAuth: true }, // Esta ruta requiere autenticación
+  },
+  {
+    path: "/create-client",
+    component: CreateClient,
     meta: { requiresAuth: true }, // Esta ruta requiere autenticación
   },
 ];
