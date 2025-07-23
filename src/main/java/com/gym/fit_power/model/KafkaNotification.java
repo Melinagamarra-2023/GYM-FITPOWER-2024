@@ -11,23 +11,9 @@ import java.time.LocalDateTime;
 @ToString
 public abstract class KafkaNotification<E> {
 
-    @NotNull
-    @NotBlank
     private LocalDateTime date;
-
-    @NotNull
-    @NotBlank
     private E sender;
-
-    @NotNull
-    @NotBlank
     private Client client;
-
-    @NotNull
-    @NotBlank
     private String reason;
-
-    @NotNull
-    @NotBlank
     private String message;
 }
