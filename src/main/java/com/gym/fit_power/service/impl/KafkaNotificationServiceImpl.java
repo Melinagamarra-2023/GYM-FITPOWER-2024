@@ -2,9 +2,7 @@ package com.gym.fit_power.service.impl;
 
 import java.time.LocalDateTime;
 import com.gym.fit_power.dto.KafkaNotificationDTO;
-import com.gym.fit_power.model.KafkaNotification;
-import com.gym.fit_power.model.KafkaNutritionNotification;
-import com.gym.fit_power.model.KafkaTrainingNotification;
+import com.gym.fit_power.model.*;
 import com.gym.fit_power.repository.*;
 import com.gym.fit_power.service.KafkaNotificationService;
 import org.springframework.stereotype.Component;
@@ -33,7 +31,7 @@ public class KafkaNotificationServiceImpl implements KafkaNotificationService {
     }
 
     @Override
-    public KafkaNotificationDTO publishNutritionNotification(KafkaNotificationDTO dto) {
+    public void publishNutritionNotification(KafkaNotificationDTO dto) {
         KafkaNutritionNotification notification = new KafkaNutritionNotification();
         notification.setDate(LocalDateTime.now());
         notification.setSender(nutriRepository.findByCuit(dto.getSender()));
@@ -42,20 +40,19 @@ public class KafkaNotificationServiceImpl implements KafkaNotificationService {
         notification.setMessage(dto.getMessage());
         this.producer.send("nutrition", notification);
         kafkaNutritionRepository.save(notification);
-        return this.toDTO(notification);
     }
 
     @Override
-    public KafkaNotificationDTO publishTrainingNotification(KafkaNotificationDTO dto) {
+    public void publishTrainingNotification(KafkaNotificationDTO dto) {
         KafkaTrainingNotification notification = new KafkaTrainingNotification();
         notification.setDate(LocalDateTime.now());
+        Gym gym = new Gym(5L, "addres", "domain", "mail", "phone", true);
         notification.setSender(trainerRepository.findByCuit(dto.getSender()));
         notification.setClient(clientRepository.findByCuit(dto.getClient()));
         notification.setReason(dto.getReason());
         notification.setMessage(dto.getMessage());
-        this.producer.send("nutrition", notification);
+        this.producer.send("train", notification);
         kafkaTrainingRepository.save(notification);
-        return this.toDTO(notification);
     }
 
     public KafkaNotificationDTO toDTO(KafkaNotification<?> entity) {
