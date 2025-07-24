@@ -1,6 +1,6 @@
 package com.gym.fit_power.config;
 
-import com.gym.fit_power.notification.event.Event;
+import com.gym.fit_power.model.KafkaNotification;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.context.annotation.Bean;
@@ -17,7 +17,7 @@ import java.util.Map;
 public class KafkaProvider {
 
     @Bean
-    public ProducerFactory<String, Event<?>> producerFactory() {
+    public ProducerFactory<String, KafkaNotification<?>> producerFactory() {
         Map<String, Object> configProps = new HashMap<>();
         String bootstrapAddress = "localhost:9092";
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
@@ -27,7 +27,7 @@ public class KafkaProvider {
     }
 
     @Bean
-    public KafkaTemplate<String, Event<?>> kafkaTemplate() {
+    public KafkaTemplate<String, KafkaNotification<?>> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
 
