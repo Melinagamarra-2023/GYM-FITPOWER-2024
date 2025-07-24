@@ -22,8 +22,7 @@ public class ClientServiceImpl implements ClientService {
     GymRepository gymRepository;
     ClientRepository clientRepository;
 
-    public ClientServiceImpl(ClientRepository clientRepository, GymRepository gymRepository,
-                             KafkaNotificationServiceImpl clientEventPublisher) {
+    public ClientServiceImpl(ClientRepository clientRepository, GymRepository gymRepository) {
         this.gymRepository = gymRepository;
         this.clientRepository = clientRepository;
     }
