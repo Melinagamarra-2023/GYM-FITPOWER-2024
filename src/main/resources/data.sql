@@ -5,11 +5,12 @@ INSERT INTO roles (name) VALUES ('NUTRITIONIST');
 
 -- users
 INSERT INTO users (cuit, email, password) VALUES
-('11111111111', 'trainer@trainer.com', '$2a$10$2GB1QtXuLx/7p0huq8CRe.bjhKrZwQ7c1PuSiC/kfA0KkueRmJPF2'),
-('22222222222', 'client@client.com', '$2a$10$3Mlnzoi3xXrs1JtRUmByCeuSccqQibomi5mQEAxkc0RKvTAOAAANi'),
-('33333333333', 'nutri@nutri.com', '$2a$10$T4B5mdXG55I4mR7o7K5yBOIEwqSmwmsGVLClLe0D/AjV7H9iTb3e6');
+('20-00000000-0', 'a@a.com', '$2a$10$8LvodzfUMHXMBJdI5rFuRu0gexDBcltXtzF8O/mfBZ2IpxO5akfQG'),--dato de pruebas
+('11-11111111-1', 'trainer@trainer.com', '$2a$10$2GB1QtXuLx/7p0huq8CRe.bjhKrZwQ7c1PuSiC/kfA0KkueRmJPF2'),
+('22-22222222-2', 'client@client.com', '$2a$10$3Mlnzoi3xXrs1JtRUmByCeuSccqQibomi5mQEAxkc0RKvTAOAAANi'),
+('33-33333333-3', 'nutri@nutri.com', '$2a$10$T4B5mdXG55I4mR7o7K5yBOIEwqSmwmsGVLClLe0D/AjV7H9iTb3e6');
 
-INSERT INTO users_roles (user_id, role_id) VALUES(1, 3), (2, 1), (3, 4);
+INSERT INTO users_roles (user_id, role_id) VALUES(1, 2), (2, 3), (3, 1), (4, 4);
 
 INSERT INTO trainers (cuit, name, lastname, email, phone_number, enabled) VALUES
 ('11111111111', 'trainer', 'trainer', 'trainer@trainer.com', '1111111111', TRUE);

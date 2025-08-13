@@ -15,5 +15,6 @@ public class GymDTO {
     private String address;
     private String mail;
     private String phone;
+    private Boolean enabled;
 
 }
