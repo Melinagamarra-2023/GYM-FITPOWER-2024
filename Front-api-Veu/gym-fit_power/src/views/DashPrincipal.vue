@@ -39,6 +39,19 @@
         </li>
         <li
           class="nav-item mb-2"
+          :class="{ 'bg-secondary rounded': activeTab === 'gyms' }"
+        >
+          <a
+            class="nav-link text-white d-flex align-items-center"
+            href="#"
+            @click.prevent="activeTab = 'gyms'"
+          >
+            <i class="bi bi-building me-2"></i>
+            <span v-if="!isCollapsed">Gimnasios</span>
+          </a>
+        </li>
+        <li
+          class="nav-item mb-2"
           :class="{ 'bg-secondary rounded': activeTab === 'profile' }"
         >
           <a
@@ -91,6 +104,9 @@
       <div v-else-if="activeTab === 'create-client'">
         <CreateClient />
       </div>
+      <div v-else-if="activeTab === 'gyms'">
+        <GymCrud />
+      </div>
       <div v-else-if="activeTab === 'profile'">
         <h1><i class="bi bi-person me-2"></i>Perfil</h1>
         <p>Aquí puedes ver y editar tu perfil.</p>
@@ -108,6 +124,7 @@ import { ref } from "vue";
 import { useAuthStore } from "../store/auth";
 import { useRouter } from "vue-router";
 import CreateClient from "./CreateClient.vue";
+import GymCrud from "./GymCrud.vue";
 
 const auth = useAuthStore();
 const router = useRouter();

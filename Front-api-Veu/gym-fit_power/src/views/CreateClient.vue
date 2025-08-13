@@ -42,7 +42,7 @@
                     required
                   >
                     <option value="">
-                      Seleccione una direccion del gimnasio
+                      Seleccione una dirección de una sucursal
                     </option>
                     <option
                       v-for="gym in gyms"
@@ -53,8 +53,47 @@
                     </option>
                   </select>
                   <div class="invalid-feedback">
-                    Por favor seleccione una direccion del gimnasio.
+                    Por favor seleccione una sucursal .
                   </div>
+                </div>
+              </div>
+
+              <!-- Asignaciones de Entrenador y Nutricionista -->
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="assignedTrainer" class="form-label">Entrenador Asignado</label>
+                  <select
+                    class="form-select"
+                    id="assignedTrainer"
+                    v-model="clientForm.assignedTrainer"
+                  >
+                    <option value="">Seleccione un entrenador</option>
+                    <option
+                      v-for="trainer in trainers"
+                      :key="trainer.cuit"
+                      :value="trainer.cuit"
+                    >
+                      {{ trainer.name }} {{ trainer.lastname }} ({{ trainer.cuit }})
+                    </option>
+                  </select>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="assignedNutritionist" class="form-label">Nutricionista Asignado</label>
+                  <select
+                    class="form-select"
+                    id="assignedNutritionist"
+                    v-model="clientForm.assignedNutritionist"
+                  >
+                    <option value="">Seleccione un nutricionista</option>
+                    <option
+                      v-for="nutri in nutritionists"
+                      :key="nutri.cuit"
+                      :value="nutri.cuit"
+                    >
+                      {{ nutri.name }} {{ nutri.lastname }} ({{ nutri.cuit }})
+                    </option>
+                  </select>
                 </div>
               </div>
 
@@ -189,6 +228,8 @@ import { useAuthStore } from "../store/auth";
 const auth = useAuthStore();
 const isSubmitting = ref(false);
 const gyms = ref([]);
+  const trainers = ref([]);
+  const nutritionists = ref([]);
 
 // Emitir eventos al componente padre   
 // eslint-disable-next-line no-undef
@@ -198,6 +239,8 @@ const emit = defineEmits(["client-created", "client-error"]);
 const clientForm = reactive({
   cuit: "",
   assignedGym: "",
+    assignedTrainer: "",
+    assignedNutritionist: "",
   name: "",
   lastname: "",
   email: "",
@@ -259,6 +302,59 @@ const loadGyms = async () => {
   } catch (error) {
     console.error("Error de conexión al cargar gimnasios:", error);
     showAlert("Error de conexión al cargar gimnasios", "error");
+  }
+};
+
+// Cargar entrenadores disponibles
+const loadTrainers = async () => {
+  try {
+    const token = auth.token;
+    const response = await fetch("/api/v1/trainer", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.ok) {
+      const trainersData = await response.json();
+      trainers.value = trainersData || [];
+    } else {
+      console.error(
+        "Error al cargar entrenadores:",
+        response.status,
+        response.statusText
+      );
+      // No interrumpimos el flujo; solo mostramos alerta no bloqueante
+    }
+  } catch (error) {
+    console.error("Error de conexión al cargar entrenadores:", error);
+  }
+};
+
+// Cargar nutricionistas disponibles
+const loadNutritionists = async () => {
+  try {
+    const token = auth.token;
+    const response = await fetch("/api/v1/Nutritionist/readAll", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.ok) {
+      const nutriData = await response.json();
+      nutritionists.value = nutriData || [];
+    } else {
+      console.error(
+        "Error al cargar nutricionistas:",
+        response.status,
+        response.statusText
+      );
+    }
+  } catch (error) {
+    console.error("Error de conexión al cargar nutricionistas:", error);
   }
 };
 
@@ -347,6 +443,8 @@ const createClient = async () => {
 // Cargar gimnasios al montar el componente
 onMounted(() => {
   loadGyms();
+  loadTrainers();
+  loadNutritionists();
 });
 
 const formatCuit = (value) => {
