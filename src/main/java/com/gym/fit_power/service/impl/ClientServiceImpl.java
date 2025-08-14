@@ -166,7 +166,7 @@ public class ClientServiceImpl implements ClientService {
     public ClientDTO toDTO(Client entity) {
         ClientDTO dto = new ClientDTO();
         dto.setCuit(entity.getCuit());
-        dto.setAssignedGym(entity.getAssignedGym().getAddress());
+        dto.setAssignedGym(entity.getAssignedGym() != null ? entity.getAssignedGym().getAddress() : null);
         dto.setName(entity.getName());
         dto.setLastname(entity.getLastname());
         dto.setEmail(entity.getEmail());

@@ -5,7 +5,7 @@
         <div class="card shadow">
           <div class="card-header text-white">
             <h4 class="mb-0">
-              <i class="bi bi-person-plus me-2"></i>Crear Nuevo Cliente
+              <i class="bi bi-person-plus me-2"></i>{{ isEdit ? 'Editar Cliente' : 'Crear Nuevo Cliente' }}
             </h4>
           </div>
           <div class="card-body">
@@ -179,9 +179,9 @@
                 <button
                   type="button"
                   class="btn btn-secondary me-md-2"
-                  @click="resetForm"
+                  @click="onCancelEdit"
                 >
-                  <i class="bi bi-arrow-clockwise me-2"></i>Limpiar
+                  <i :class="['bi', 'me-2', isEdit ? 'bi-x-circle' : 'bi-arrow-clockwise']"></i>{{ isEdit ? 'Cancelar' : 'Limpiar' }}
                 </button>
                 <button
                   type="submit"
@@ -189,10 +189,63 @@
                   :disabled="isSubmitting"
                 >
                   <i class="bi bi-check-circle me-2"></i>
-                  {{ isSubmitting ? "Creando..." : "Crear Cliente" }}
+                  {{ isSubmitting ? (isEdit ? 'Guardando...' : 'Creando...') : (isEdit ? 'Guardar Cambios' : 'Crear Cliente') }}
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-4">
+      <div class="col-12">
+        <div class="card shadow">
+          <div class="card-header text-white">
+            <h4 class="mb-0">
+              <i class="bi bi-list-ul me-2"></i>Clientes
+            </h4>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle">
+                <thead>
+                  <tr>
+                    <th>CUIT</th>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Email</th>
+                    <th>Teléfono</th>
+                    <th>Gimnasio</th>
+                    <th class="text-end">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="client in clients" :key="client.cuit">
+                    <td>{{ client.cuit }}</td>
+                    <td>{{ client.name }}</td>
+                    <td>{{ client.lastname }}</td>
+                    <td>{{ client.email }}</td>
+                    <td>{{ client.phone }}</td>
+                    <td>{{ client.assignedGym }}</td>
+                    <td class="text-end">
+                      <button class="btn btn-sm btn-outline-primary me-2" @click="onEditClient(client)">
+                        <i class="bi bi-pencil"></i>
+                      </button>
+                      <button class="btn btn-sm btn-outline-danger me-2" @click="onDisableClient(client)">
+                        <i class="bi bi-slash-circle"></i>
+                      </button>
+                      <button class="btn btn-sm btn-outline-success" @click="onEnableClient(client)">
+                        <i class="bi bi-check-circle"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr v-if="clients.length === 0">
+                    <td colspan="7" class="text-center text-muted">No hay clientes cargados.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -227,9 +280,12 @@ import { useAuthStore } from "../store/auth";
 
 const auth = useAuthStore();
 const isSubmitting = ref(false);
+const isEdit = ref(false);
+const originalCuit = ref("");
 const gyms = ref([]);
-  const trainers = ref([]);
-  const nutritionists = ref([]);
+const clients = ref([]);
+const trainers = ref([]);
+const nutritionists = ref([]);
 
 // Emitir eventos al componente padre   
 // eslint-disable-next-line no-undef
@@ -239,8 +295,8 @@ const emit = defineEmits(["client-created", "client-error"]);
 const clientForm = reactive({
   cuit: "",
   assignedGym: "",
-    assignedTrainer: "",
-    assignedNutritionist: "",
+  assignedTrainer: "",
+  assignedNutritionist: "",
   name: "",
   lastname: "",
   email: "",
@@ -305,6 +361,28 @@ const loadGyms = async () => {
   }
 };
 
+// Cargar clientes
+const loadClients = async () => {
+  try {
+    const token = auth.token;
+    const response = await fetch("/api/v1/clients", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (response.ok) {
+      clients.value = await response.json();
+    } else {
+      console.error("Error al cargar clientes:", response.status, response.statusText);
+      showToastMessage("Error al cargar clientes", "error");
+    }
+  } catch (error) {
+    console.error("Error de conexión al cargar clientes:", error);
+    showToastMessage("Error de conexión al cargar clientes", "error");
+  }
+};
+
 // Cargar entrenadores disponibles
 const loadTrainers = async () => {
   try {
@@ -352,6 +430,9 @@ const loadNutritionists = async () => {
         response.status,
         response.statusText
       );
+      if (response.status === 403) {
+        showToastMessage("No tiene permisos para ver nutricionistas", "error");
+      }
     }
   } catch (error) {
     console.error("Error de conexión al cargar nutricionistas:", error);
@@ -362,6 +443,8 @@ const resetForm = () => {
   Object.keys(clientForm).forEach((key) => {
     clientForm[key] = "";
   });
+  isEdit.value = false;
+  originalCuit.value = "";
   hideAlert();
 };
 
@@ -405,28 +488,58 @@ const createClient = async () => {
 
   try {
     const token = auth.token;
-    const response = await fetch("/api/v1/clients/create", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(clientForm),
-    });
+    const payload = {
+      cuit: clientForm.cuit,
+      assignedGym: clientForm.assignedGym,
+      name: clientForm.name,
+      lastname: clientForm.lastname,
+      email: clientForm.email,
+      phone: clientForm.phone,
+      birthDate: clientForm.birthDate,
+    };
+
+    let response;
+    if (!isEdit.value) {
+      response = await fetch("/api/v1/clients/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+    } else {
+      response = await fetch(`/api/v1/clients/${encodeURIComponent(originalCuit.value)}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+    }
 
     if (response.ok) {
       const client = await response.json();
-      showToastMessage(`Cliente ${client.name} ${client.lastname} creado exitosamente!`, "success");
+      showToastMessage(
+        !isEdit.value
+          ? `Cliente ${client.name} ${client.lastname} creado exitosamente!`
+          : `Cliente ${client.name} ${client.lastname} actualizado exitosamente!`,
+        "success"
+      );
+      await loadClients();
       setTimeout(() => {
         resetForm();
       }, 3000);
-      // Emitir evento de éxito al componente padre
       emit("client-created", client);
     } else {
-      const errorData = await response.json();
-      const errorMessage = `Error al crear cliente: ${
-        errorData.message || "Error desconocido"
-      }`;
+      let errorMessage = "Error en la operación";
+      try {
+        const errorData = await response.json();
+        errorMessage = `Error: ${errorData.message || "Error desconocido"}`;
+      } catch (parseError) {
+        console.warn("No se pudo parsear el error como JSON", parseError);
+      }
       showToastMessage(errorMessage, "error");
       emit("client-error", errorMessage);
     }
@@ -443,6 +556,7 @@ const createClient = async () => {
 // Cargar gimnasios al montar el componente
 onMounted(() => {
   loadGyms();
+  loadClients();
   loadTrainers();
   loadNutritionists();
 });
@@ -463,6 +577,60 @@ const onCuitInput = (e) => {
 
 const onPhoneInput = (e) => {
   clientForm.phone = onlyNumbers(e.target.value);
+};
+
+const onEditClient = (client) => {
+  isEdit.value = true;
+  originalCuit.value = client.cuit;
+  clientForm.cuit = client.cuit;
+  clientForm.assignedGym = client.assignedGym;
+  clientForm.name = client.name;
+  clientForm.lastname = client.lastname;
+  clientForm.email = client.email;
+  clientForm.phone = client.phone;
+  clientForm.birthDate = client.birthDate;
+};
+
+const onCancelEdit = () => {
+  resetForm();
+};
+
+const onDisableClient = async (client) => {
+  try {
+    const token = auth.token;
+    const response = await fetch(`/api/v1/clients/${encodeURIComponent(client.cuit)}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) {
+      const err = await response.text();
+      throw new Error(err || "Error al deshabilitar cliente");
+    }
+    showToastMessage("Cliente deshabilitado", "success");
+    await loadClients();
+  } catch (e) {
+    console.error(e);
+    showToastMessage(e.message || "Error al deshabilitar cliente", "error");
+  }
+};
+
+const onEnableClient = async (client) => {
+  try {
+    const token = auth.token;
+    const response = await fetch(`/api/v1/clients/${encodeURIComponent(client.cuit)}`, {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) {
+      const err = await response.text();
+      throw new Error(err || "Error al habilitar cliente");
+    }
+    showToastMessage("Cliente habilitado", "success");
+    await loadClients();
+  } catch (e) {
+    console.error(e);
+    showToastMessage(e.message || "Error al habilitar cliente", "error");
+  }
 };
 </script>
 
