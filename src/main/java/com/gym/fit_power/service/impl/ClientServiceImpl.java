@@ -90,11 +90,16 @@ public class ClientServiceImpl implements ClientService {
             log.info("Updating client with cuit: {}", cuit);
             Client oldClient = readOne(cuit);
             Client newClient = toEntity(clientDTO);
+            
+            if (newClient.getAssignedGym() != null) {
+                oldClient.setAssignedGym(newClient.getAssignedGym());
+            }
             oldClient.setName(newClient.getName());
             oldClient.setLastname(newClient.getLastname());
             oldClient.setEmail(newClient.getEmail());
             oldClient.setPhone(newClient.getPhone());
-//            oldClient.setBirthDate(newClient.getBirthDate());
+            oldClient.setBirthDate(newClient.getBirthDate());
+            
             return toDTO(clientRepository.save(oldClient));
         } catch (Exception e) {
             log.error("The client {} could not be updated. Error: ", clientDTO.getCuit(), e);

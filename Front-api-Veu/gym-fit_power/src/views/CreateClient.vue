@@ -25,6 +25,8 @@
                     required
                     maxlength="13"
                     @input="onCuitInput"
+                    :readonly="isEdit"
+                    :class="{ 'bg-light': isEdit }"
                   />
                   <div class="invalid-feedback">
                     Por favor ingrese un CUIT válido (ej: 20-12345678-9).
@@ -217,6 +219,7 @@
                     <th>Email</th>
                     <th>Teléfono</th>
                     <th>Gimnasio</th>
+                    <th>Estado</th>
                     <th class="text-end">Acciones</th>
                   </tr>
                 </thead>
@@ -228,20 +231,33 @@
                     <td>{{ client.email }}</td>
                     <td>{{ client.phone }}</td>
                     <td>{{ client.assignedGym }}</td>
+                    <td>
+                      <span class="badge" :class="client.enabled ? 'bg-success' : 'bg-secondary'">
+                        {{ client.enabled ? 'Habilitado' : 'Deshabilitado' }}
+                      </span>
+                    </td>
                     <td class="text-end">
-                      <button class="btn btn-sm btn-outline-primary me-2" @click="onEditClient(client)">
+                      <button 
+                        class="btn btn-sm btn-outline-primary me-2" 
+                        @click="onEditClient(client)"
+                        :title="'Editar ' + client.name + ' ' + client.lastname"
+                      >
                         <i class="bi bi-pencil"></i>
                       </button>
-                      <button class="btn btn-sm btn-outline-danger me-2" @click="onDisableClient(client)">
-                        <i class="bi bi-slash-circle"></i>
-                      </button>
-                      <button class="btn btn-sm btn-outline-success" @click="onEnableClient(client)">
-                        <i class="bi bi-check-circle"></i>
+                      <button
+                        class="btn btn-sm"
+                        :class="client.enabled ? 'btn-outline-danger' : 'btn-outline-success'"
+                        @click="onToggleEnabled(client)"
+                        :title="client.enabled ? 'Deshabilitar cliente' : 'Habilitar cliente'"
+                        :disabled="togglingClient === client.cuit"
+                      >
+                        <i v-if="togglingClient !== client.cuit" :class="client.enabled ? 'bi bi-slash-circle' : 'bi bi-check-circle'" />
+                        <i v-else class="bi bi-arrow-clockwise spin"></i>
                       </button>
                     </td>
                   </tr>
                   <tr v-if="clients.length === 0">
-                    <td colspan="7" class="text-center text-muted">No hay clientes cargados.</td>
+                    <td colspan="8" class="text-center text-muted">No hay clientes cargados.</td>
                   </tr>
                 </tbody>
               </table>
@@ -286,6 +302,7 @@ const gyms = ref([]);
 const clients = ref([]);
 const trainers = ref([]);
 const nutritionists = ref([]);
+const togglingClient = ref(null); // Para controlar qué cliente se está modificando
 
 // Emitir eventos al componente padre   
 // eslint-disable-next-line no-undef
@@ -595,41 +612,45 @@ const onCancelEdit = () => {
   resetForm();
 };
 
-const onDisableClient = async (client) => {
-  try {
-    const token = auth.token;
-    const response = await fetch(`/api/v1/clients/${encodeURIComponent(client.cuit)}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!response.ok) {
-      const err = await response.text();
-      throw new Error(err || "Error al deshabilitar cliente");
-    }
-    showToastMessage("Cliente deshabilitado", "success");
-    await loadClients();
-  } catch (e) {
-    console.error(e);
-    showToastMessage(e.message || "Error al deshabilitar cliente", "error");
+const onToggleEnabled = async (client) => {
+  // Evitar múltiples clicks
+  if (togglingClient.value === client.cuit) {
+    return;
   }
-};
 
-const onEnableClient = async (client) => {
   try {
+    togglingClient.value = client.cuit;
     const token = auth.token;
-    const response = await fetch(`/api/v1/clients/${encodeURIComponent(client.cuit)}`, {
-      method: "PATCH",
+    
+    // DELETE para deshabilitar, PATCH para habilitar (según el controlador del backend)
+    const method = client.enabled ? "DELETE" : "PATCH";
+    const url = `/api/v1/clients/${encodeURIComponent(client.cuit)}`;
+
+    const response = await fetch(url, {
+      method: method,
       headers: { Authorization: `Bearer ${token}` },
     });
+
     if (!response.ok) {
       const err = await response.text();
-      throw new Error(err || "Error al habilitar cliente");
+      throw new Error(err || "Error al cambiar el estado del cliente");
     }
-    showToastMessage("Cliente habilitado", "success");
+
+    // Actualizar dinámicamente el estado del cliente en la lista
+    client.enabled = !client.enabled;
+    
+    showToastMessage(
+      client.enabled ? "Cliente habilitado" : "Cliente deshabilitado", 
+      "success"
+    );
+    
+    // Recargar la lista para asegurar sincronización con el backend
     await loadClients();
   } catch (e) {
     console.error(e);
-    showToastMessage(e.message || "Error al habilitar cliente", "error");
+    showToastMessage(e.message || "Error al cambiar el estado del cliente", "error");
+  } finally {
+    togglingClient.value = null;
   }
 };
 </script>
@@ -644,6 +665,26 @@ const onEnableClient = async (client) => {
 .form-select:focus {
   border-color: #0d6efd;
   box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.form-control[readonly] {
+  background-color: #f8f9fa;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.badge {
+  font-size: 0.75rem;
+  padding: 0.5em 0.75em;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .btn {
