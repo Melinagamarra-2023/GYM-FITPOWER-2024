@@ -34,7 +34,7 @@
             @click.prevent="activeTab = 'create-client'"
           >
             <i class="bi bi-person-plus me-2"></i>
-            <span v-if="!isCollapsed">Crear Cliente</span>
+            <span v-if="!isCollapsed">Clientes</span>
           </a>
         </li>
         <li
