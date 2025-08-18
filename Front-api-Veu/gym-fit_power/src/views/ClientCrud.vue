@@ -219,6 +219,8 @@
                     <th>Email</th>
                     <th>Teléfono</th>
                     <th>Gimnasio</th>
+                    <th>Entrenador</th>
+                    <th>Nutricionista</th>
                     <th>Estado</th>
                     <th class="text-end">Acciones</th>
                   </tr>
@@ -231,6 +233,8 @@
                     <td>{{ client.email }}</td>
                     <td>{{ client.phone }}</td>
                     <td>{{ client.assignedGym }}</td>
+                    <td>{{ client.assignedTrainer || 'No asignado' }}</td>
+                    <td>{{ client.assignedNutritionist || 'No asignado' }}</td>
                     <td>
                       <span class="badge" :class="client.enabled ? 'bg-success' : 'bg-secondary'">
                         {{ client.enabled ? 'Habilitado' : 'Deshabilitado' }}
@@ -257,7 +261,7 @@
                     </td>
                   </tr>
                   <tr v-if="clients.length === 0">
-                    <td colspan="8" class="text-center text-muted">No hay clientes cargados.</td>
+                    <td colspan="10" class="text-center text-muted">No hay clientes cargados.</td>
                   </tr>
                 </tbody>
               </table>
@@ -508,6 +512,8 @@ const createClient = async () => {
     const payload = {
       cuit: clientForm.cuit,
       assignedGym: clientForm.assignedGym,
+      assignedTrainer: clientForm.assignedTrainer || null,
+      assignedNutritionist: clientForm.assignedNutritionist || null,
       name: clientForm.name,
       lastname: clientForm.lastname,
       email: clientForm.email,
@@ -601,6 +607,8 @@ const onEditClient = (client) => {
   originalCuit.value = client.cuit;
   clientForm.cuit = client.cuit;
   clientForm.assignedGym = client.assignedGym;
+  clientForm.assignedTrainer = client.assignedTrainer || "";
+  clientForm.assignedNutritionist = client.assignedNutritionist || "";
   clientForm.name = client.name;
   clientForm.lastname = client.lastname;
   clientForm.email = client.email;

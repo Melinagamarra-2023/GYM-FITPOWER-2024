@@ -26,12 +26,12 @@
         </li>
         <li
           class="nav-item mb-2"
-          :class="{ 'bg-secondary rounded': activeTab === 'create-client' }"
+          :class="{ 'bg-secondary rounded': activeTab === 'client-crud' }"
         >
           <a
             class="nav-link text-white d-flex align-items-center"
             href="#"
-            @click.prevent="activeTab = 'create-client'"
+            @click.prevent="activeTab = 'client-crud'"
           >
             <i class="bi bi-person-plus me-2"></i>
             <span v-if="!isCollapsed">Clientes</span>
@@ -101,8 +101,8 @@
           </p>
         </div>
       </div>
-      <div v-else-if="activeTab === 'create-client'">
-        <CreateClient />
+      <div v-else-if="activeTab === 'client-crud'">
+        <ClientCrud />
       </div>
       <div v-else-if="activeTab === 'gyms'">
         <GymCrud />
@@ -123,7 +123,7 @@
 import { ref } from "vue";
 import { useAuthStore } from "../store/auth";
 import { useRouter } from "vue-router";
-import CreateClient from "./CreateClient.vue";
+import ClientCrud from "./ClientCrud.vue";
 import GymCrud from "./GymCrud.vue";
 
 const auth = useAuthStore();
