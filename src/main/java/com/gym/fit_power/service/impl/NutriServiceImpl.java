@@ -139,9 +139,8 @@ public class NutriServiceImpl implements NutriService {
         response.setCuit(nutri.getCuit());
         response.setPhone(nutri.getPhone());
         response.setEmail(nutri.getEmail());
-        response.setCreatedAt(nutri.getCreatedAt().toString());
+        response.setCreatedAt(nutri.getCreatedAt() != null ? nutri.getCreatedAt().toString() : null);
         return response;
-
     }
 
 }
