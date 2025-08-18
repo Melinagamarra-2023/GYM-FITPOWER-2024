@@ -20,6 +20,7 @@ public class ClientDTO {
     private String email;
     private String phone;
     private String birthDate;
+    private Boolean enabled;
 
     public ClientDTO toDto(Client entity) {
         ClientDTO dto = new ClientDTO();
@@ -32,6 +33,7 @@ public class ClientDTO {
         dto.setEmail(entity.getEmail());
         dto.setPhone(entity.getPhone());
         dto.setBirthDate(entity.getBirthDate() != null ? entity.getBirthDate().toString() : null);
+        dto.setEnabled(entity.isEnabled());
         return dto;
     }
 

@@ -181,6 +181,9 @@ public class ClientServiceImpl implements ClientService {
         if (dto.getBirthDate() != null && !dto.getBirthDate().isEmpty()) {
             entity.setBirthDate(LocalDate.parse(dto.getBirthDate()));
         }
+        if (dto.getEnabled() != null) {
+            entity.setEnabled(dto.getEnabled());
+        }
         return entity;
     }
 
@@ -194,6 +197,7 @@ public class ClientServiceImpl implements ClientService {
         dto.setEmail(entity.getEmail());
         dto.setPhone(entity.getPhone());
         dto.setBirthDate(entity.getBirthDate() != null ? entity.getBirthDate().toString() : null);
+        dto.setEnabled(entity.isEnabled());
         return dto;
     }
 

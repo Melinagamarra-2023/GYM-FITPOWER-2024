@@ -287,10 +287,8 @@
                         :class="client.enabled ? 'btn-outline-danger' : 'btn-outline-success'"
                         @click="onToggleEnabled(client)"
                         :title="client.enabled ? 'Deshabilitar cliente' : 'Habilitar cliente'"
-                        :disabled="togglingClient === client.cuit"
                       >
-                        <i v-if="togglingClient !== client.cuit" :class="client.enabled ? 'bi bi-slash-circle' : 'bi bi-check-circle'" />
-                        <i v-else class="bi bi-arrow-clockwise spin"></i>
+                        <i :class="client.enabled ? 'bi bi-slash-circle' : 'bi bi-check-circle'" />
                       </button>
                     </td>
                   </tr>
@@ -340,7 +338,7 @@ const gyms = ref([]);
 const clients = ref([]);
 const trainers = ref([]);
 const nutritionists = ref([]);
-const togglingClient = ref(null); // Para controlar qué cliente se está modificando
+
 const isLoadingTrainers = ref(false);
 const isLoadingNutritionists = ref(false);
 
@@ -402,7 +400,6 @@ const loadGyms = async () => {
 
     if (response.ok) {
       const gymsData = await response.json();
-      console.log("Gimnasios cargados:", gymsData);
       gyms.value = gymsData;
     } else {
       console.error(
@@ -429,13 +426,14 @@ const loadClients = async () => {
       },
     });
     if (response.ok) {
-      clients.value = await response.json();
+      const clientsData = await response.json();
+      clients.value = clientsData;
     } else {
-      console.error("Error al cargar clientes:", response.status, response.statusText);
+      console.error("❌ Error al cargar clientes:", response.status, response.statusText);
       showToastMessage("Error al cargar clientes", "error");
     }
   } catch (error) {
-    console.error("Error de conexión al cargar clientes:", error);
+    console.error("❌ Error de conexión al cargar clientes:", error);
     showToastMessage("Error de conexión al cargar clientes", "error");
   }
 };
@@ -455,7 +453,6 @@ const loadTrainers = async () => {
     if (response.ok) {
       const trainersData = await response.json();
       trainers.value = trainersData || [];
-      console.log("Entrenadores cargados:", trainersData);
     } else {
       console.error(
         "Error al cargar entrenadores:",
@@ -491,7 +488,6 @@ const loadNutritionists = async () => {
     if (response.ok) {
       const nutriData = await response.json();
       nutritionists.value = nutriData || [];
-      console.log("Nutricionistas cargados:", nutriData);
     } else {
       console.error(
         "Error al cargar nutricionistas:",
@@ -636,6 +632,12 @@ onMounted(() => {
   loadNutritionists();
 });
 
+// Watcher para debuggear cambios en la lista de clientes
+import { watch } from "vue";
+watch(clients, (newClients) => {
+  newClients;
+}, { deep: true });
+
 const formatCuit = (value) => {
   let digits = value.replace(/\D/g, '');
   if (digits.length > 2) digits = digits.slice(0, 2) + '-' + digits.slice(2);
@@ -673,53 +675,31 @@ const onCancelEdit = () => {
 };
 
 const onToggleEnabled = async (client) => {
-  // Evitar múltiples clicks
-  if (togglingClient.value === client.cuit) {
-    return;
-  }
-
   try {
-    togglingClient.value = client.cuit;
     const token = auth.token;
-    
-    // Según el backend: DELETE para deshabilitar, PATCH para habilitar
     const method = client.enabled ? "DELETE" : "PATCH";
     const url = `/api/v1/clients/${encodeURIComponent(client.cuit)}`;
-
+    
+    
     const response = await fetch(url, {
-      method: method,
-      headers: { 
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}` 
-      },
+      method,
+      headers: { Authorization: `Bearer ${token}` },
     });
-
+    
+    
     if (!response.ok) {
-      let errorMessage = "Error al cambiar el estado del cliente";
-      try {
-        const errorData = await response.text();
-        errorMessage = errorData || errorMessage;
-      } catch (parseError) {
-        console.warn("No se pudo parsear el error", parseError);
-      }
-      throw new Error(errorMessage);
+      const err = await response.text();
+      console.error("❌ Error en respuesta:", err);
+      throw new Error(err || "Error al cambiar estado");
     }
-
-    // Actualizar dinámicamente el estado del cliente en la lista
-    client.enabled = !client.enabled;
     
-    showToastMessage(
-      client.enabled ? "Cliente habilitado exitosamente" : "Cliente deshabilitado exitosamente", 
-      "success"
-    );
+    showToastMessage(client.enabled ? "Cliente deshabilitado" : "Cliente habilitado", "success");
     
-    // Recargar la lista para asegurar sincronización con el backend
     await loadClients();
+    
   } catch (e) {
-    console.error("Error al cambiar estado del cliente:", e);
-    showToastMessage(e.message || "Error al cambiar el estado del cliente", "error");
-  } finally {
-    togglingClient.value = null;
+    console.error("❌ Error en onToggleEnabled:", e);
+    showToastMessage(e.message || "Error al cambiar estado", "error");
   }
 };
 </script>
@@ -747,14 +727,7 @@ const onToggleEnabled = async (client) => {
   padding: 0.5em 0.75em;
 }
 
-.spin {
-  animation: spin 1s linear infinite;
-}
 
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
 
 .btn {
   border-radius: 8px;
