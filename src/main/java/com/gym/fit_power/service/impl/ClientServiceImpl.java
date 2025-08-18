@@ -3,10 +3,14 @@ package com.gym.fit_power.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import com.gym.fit_power.model.Gym;
 import com.gym.fit_power.model.Client;
+import com.gym.fit_power.model.Trainer;
+import com.gym.fit_power.model.Nutritionist;
 import com.gym.fit_power.dto.ClientDTO;
 import org.springframework.stereotype.Service;
 import com.gym.fit_power.service.ClientService;
 import com.gym.fit_power.repository.GymRepository;
+import com.gym.fit_power.repository.TrainerRepository;
+import com.gym.fit_power.repository.NutriRepository;
 import org.springframework.dao.DataAccessException;
 import com.gym.fit_power.repository.ClientRepository;
 
@@ -19,12 +23,17 @@ import java.time.format.DateTimeFormatter;
 @Service
 public class ClientServiceImpl implements ClientService {
 
-    GymRepository gymRepository;
-    ClientRepository clientRepository;
+    private final ClientRepository clientRepository;
+    private final GymRepository gymRepository;
+    private final TrainerRepository trainerRepository;
+    private final NutriRepository nutriRepository;
 
-    public ClientServiceImpl(ClientRepository clientRepository, GymRepository gymRepository) {
-        this.gymRepository = gymRepository;
+    public ClientServiceImpl(ClientRepository clientRepository, GymRepository gymRepository, 
+                           TrainerRepository trainerRepository, NutriRepository nutriRepository) {
         this.clientRepository = clientRepository;
+        this.gymRepository = gymRepository;
+        this.trainerRepository = trainerRepository;
+        this.nutriRepository = nutriRepository;
     }
 
     @Override
@@ -94,6 +103,12 @@ public class ClientServiceImpl implements ClientService {
             if (newClient.getAssignedGym() != null) {
                 oldClient.setAssignedGym(newClient.getAssignedGym());
             }
+            if (newClient.getAssignedTrainer() != null) {
+                oldClient.setAssignedTrainer(newClient.getAssignedTrainer());
+            }
+            if (newClient.getAssignedNutritionist() != null) {
+                oldClient.setAssignedNutritionist(newClient.getAssignedNutritionist());
+            }
             oldClient.setName(newClient.getName());
             oldClient.setLastname(newClient.getLastname());
             oldClient.setEmail(newClient.getEmail());
@@ -157,6 +172,8 @@ public class ClientServiceImpl implements ClientService {
         Client entity = new Client();
         entity.setCuit(dto.getCuit());
         entity.setAssignedGym(verifyGym(dto.getAssignedGym()));
+        entity.setAssignedTrainer(verifyTrainer(dto.getAssignedTrainer()));
+        entity.setAssignedNutritionist(verifyNutritionist(dto.getAssignedNutritionist()));
         entity.setName(dto.getName());
         entity.setLastname(dto.getLastname());
         entity.setEmail(dto.getEmail());
@@ -189,4 +206,17 @@ public class ClientServiceImpl implements ClientService {
         return null;
     }
 
+    private Trainer verifyTrainer(String cuit) {
+        if (cuit == null || cuit.trim().isEmpty()) {
+            return null;
+        }
+        return trainerRepository.findByCuit(cuit).orElse(null);
+    }
+
+    private Nutritionist verifyNutritionist(String cuit) {
+        if (cuit == null || cuit.trim().isEmpty()) {
+            return null;
+        }
+        return nutriRepository.findByCuit(cuit);
+    }
 }

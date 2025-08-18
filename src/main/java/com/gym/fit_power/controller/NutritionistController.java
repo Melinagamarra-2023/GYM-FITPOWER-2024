@@ -38,10 +38,10 @@ public class NutritionistController {
     @GetMapping("/readOne/{id}")
     public ResponseEntity<ResponseNutri> readOneNutritionist(@PathVariable Long id){
         logger.info(FINDONE +"{}", id);
-        if (service.readOne(id) != null){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
         ResponseNutri response = service.readOne(id);
+        if (response == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -55,20 +55,20 @@ public class NutritionistController {
     @PutMapping("/update/{id}")
     public ResponseEntity<ResponseNutri> updateNutritionist(@PathVariable Long id, @RequestBody RequestNutri requestNutri){
         logger.info(UPDATE +"{} {}", id ,requestNutri.getName());
-        if (service.readOne(id) != null){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
         ResponseNutri response = service.update(id,requestNutri);
+        if (response == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @DeleteMapping("/disable/{id}")
     public ResponseEntity<ResponseNutri> desableNutritionist(@PathVariable Long id){
         logger.info(DISABLE+ "{}", id);
-        if (service.readOne(id) != null){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
         ResponseNutri response = service.disable(id);
+        if (response == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
         return new ResponseEntity<>(response,HttpStatus.OK);
 
     }
@@ -76,10 +76,10 @@ public class NutritionistController {
     @PatchMapping("/enabled/{id}")
     public ResponseEntity<ResponseNutri> enabledNutritionist (@PathVariable Long id){
         logger.info(ENABLED+ "{}", id);
-        if (service.readOne(id) != null){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
         ResponseNutri response = service.enable(id);
+        if (response == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 

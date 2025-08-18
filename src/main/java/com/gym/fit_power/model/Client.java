@@ -6,6 +6,8 @@ import java.util.List;
 import java.time.LocalDate;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import com.gym.fit_power.model.Trainer;
+import com.gym.fit_power.model.Nutritionist;
 
 @Getter
 @Setter
@@ -25,6 +27,12 @@ public class Client {
     @ManyToOne
 //    @JoinColumn(nullable = false)
     private Gym assignedGym;
+
+    @ManyToOne
+    private Trainer assignedTrainer;
+
+    @ManyToOne
+    private Nutritionist assignedNutritionist;
 
     @OneToMany(mappedBy = "client")
     private List<Routine> routines;

@@ -68,8 +68,11 @@
                     class="form-select"
                     id="assignedTrainer"
                     v-model="clientForm.assignedTrainer"
+                    :disabled="isLoadingTrainers"
                   >
-                    <option value="">Seleccione un entrenador</option>
+                    <option value="">
+                      {{ isLoadingTrainers ? 'Cargando entrenadores...' : 'Seleccione un entrenador' }}
+                    </option>
                     <option
                       v-for="trainer in trainers"
                       :key="trainer.cuit"
@@ -78,6 +81,20 @@
                       {{ trainer.name }} {{ trainer.lastname }} ({{ trainer.cuit }})
                     </option>
                   </select>
+                  <div v-if="isLoadingTrainers" class="form-text text-muted">
+                    <i class="bi bi-arrow-clockwise spin me-1"></i>Cargando entrenadores...
+                  </div>
+                  <div v-else-if="trainers.length === 0" class="form-text text-muted">
+                    No hay entrenadores disponibles
+                    <button 
+                      type="button" 
+                      class="btn btn-sm btn-outline-secondary ms-2"
+                      @click="loadTrainers"
+                      :disabled="isLoadingTrainers"
+                    >
+                      <i class="bi bi-arrow-clockwise me-1"></i>Reintentar
+                    </button>
+                  </div>
                 </div>
 
                 <div class="col-md-6 mb-3">
@@ -86,8 +103,11 @@
                     class="form-select"
                     id="assignedNutritionist"
                     v-model="clientForm.assignedNutritionist"
+                    :disabled="isLoadingNutritionists"
                   >
-                    <option value="">Seleccione un nutricionista</option>
+                    <option value="">
+                      {{ isLoadingNutritionists ? 'Cargando nutricionistas...' : 'Seleccione un nutricionista' }}
+                    </option>
                     <option
                       v-for="nutri in nutritionists"
                       :key="nutri.cuit"
@@ -96,6 +116,20 @@
                       {{ nutri.name }} {{ nutri.lastname }} ({{ nutri.cuit }})
                     </option>
                   </select>
+                  <div v-if="isLoadingNutritionists" class="form-text text-muted">
+                    <i class="bi bi-arrow-clockwise spin me-1"></i>Cargando nutricionistas...
+                  </div>
+                  <div v-else-if="nutritionists.length === 0" class="form-text text-muted">
+                    No hay nutricionistas disponibles
+                    <button 
+                      type="button" 
+                      class="btn btn-sm btn-outline-secondary ms-2"
+                      @click="loadNutritionists"
+                      :disabled="isLoadingNutritionists"
+                    >
+                      <i class="bi bi-arrow-clockwise me-1"></i>Reintentar
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -307,6 +341,8 @@ const clients = ref([]);
 const trainers = ref([]);
 const nutritionists = ref([]);
 const togglingClient = ref(null); // Para controlar qué cliente se está modificando
+const isLoadingTrainers = ref(false);
+const isLoadingNutritionists = ref(false);
 
 // Emitir eventos al componente padre   
 // eslint-disable-next-line no-undef
@@ -407,6 +443,7 @@ const loadClients = async () => {
 // Cargar entrenadores disponibles
 const loadTrainers = async () => {
   try {
+    isLoadingTrainers.value = true;
     const token = auth.token;
     const response = await fetch("/api/v1/trainer", {
       method: "GET",
@@ -418,22 +455,31 @@ const loadTrainers = async () => {
     if (response.ok) {
       const trainersData = await response.json();
       trainers.value = trainersData || [];
+      console.log("Entrenadores cargados:", trainersData);
     } else {
       console.error(
         "Error al cargar entrenadores:",
         response.status,
         response.statusText
       );
-      // No interrumpimos el flujo; solo mostramos alerta no bloqueante
+      if (response.status === 403) {
+        showToastMessage("No tiene permisos para ver entrenadores", "error");
+      } else {
+        showToastMessage("Error al cargar entrenadores", "error");
+      }
     }
   } catch (error) {
     console.error("Error de conexión al cargar entrenadores:", error);
+    showToastMessage("Error de conexión al cargar entrenadores", "error");
+  } finally {
+    isLoadingTrainers.value = false;
   }
 };
 
 // Cargar nutricionistas disponibles
 const loadNutritionists = async () => {
   try {
+    isLoadingNutritionists.value = true;
     const token = auth.token;
     const response = await fetch("/api/v1/Nutritionist/readAll", {
       method: "GET",
@@ -445,6 +491,7 @@ const loadNutritionists = async () => {
     if (response.ok) {
       const nutriData = await response.json();
       nutritionists.value = nutriData || [];
+      console.log("Nutricionistas cargados:", nutriData);
     } else {
       console.error(
         "Error al cargar nutricionistas:",
@@ -453,10 +500,15 @@ const loadNutritionists = async () => {
       );
       if (response.status === 403) {
         showToastMessage("No tiene permisos para ver nutricionistas", "error");
+      } else {
+        showToastMessage("Error al cargar nutricionistas", "error");
       }
     }
   } catch (error) {
     console.error("Error de conexión al cargar nutricionistas:", error);
+    showToastMessage("Error de conexión al cargar nutricionistas", "error");
+  } finally {
+    isLoadingNutritionists.value = false;
   }
 };
 
@@ -630,32 +682,41 @@ const onToggleEnabled = async (client) => {
     togglingClient.value = client.cuit;
     const token = auth.token;
     
-    // DELETE para deshabilitar, PATCH para habilitar (según el controlador del backend)
+    // Según el backend: DELETE para deshabilitar, PATCH para habilitar
     const method = client.enabled ? "DELETE" : "PATCH";
     const url = `/api/v1/clients/${encodeURIComponent(client.cuit)}`;
 
     const response = await fetch(url, {
       method: method,
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { 
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}` 
+      },
     });
 
     if (!response.ok) {
-      const err = await response.text();
-      throw new Error(err || "Error al cambiar el estado del cliente");
+      let errorMessage = "Error al cambiar el estado del cliente";
+      try {
+        const errorData = await response.text();
+        errorMessage = errorData || errorMessage;
+      } catch (parseError) {
+        console.warn("No se pudo parsear el error", parseError);
+      }
+      throw new Error(errorMessage);
     }
 
     // Actualizar dinámicamente el estado del cliente en la lista
     client.enabled = !client.enabled;
     
     showToastMessage(
-      client.enabled ? "Cliente habilitado" : "Cliente deshabilitado", 
+      client.enabled ? "Cliente habilitado exitosamente" : "Cliente deshabilitado exitosamente", 
       "success"
     );
     
     // Recargar la lista para asegurar sincronización con el backend
     await loadClients();
   } catch (e) {
-    console.error(e);
+    console.error("Error al cambiar estado del cliente:", e);
     showToastMessage(e.message || "Error al cambiar el estado del cliente", "error");
   } finally {
     togglingClient.value = null;

@@ -13,6 +13,8 @@ public class ClientDTO {
     private Long id;
     private String cuit;
     private String assignedGym;
+    private String assignedTrainer;
+    private String assignedNutritionist;
     private String name;
     private String lastname;
     private String email;
@@ -22,7 +24,9 @@ public class ClientDTO {
     public ClientDTO toDto(Client entity) {
         ClientDTO dto = new ClientDTO();
         dto.setCuit(entity.getCuit());
-        dto.setAssignedGym(entity.getAssignedGym().getAddress());
+        dto.setAssignedGym(entity.getAssignedGym() != null ? entity.getAssignedGym().getAddress() : null);
+        dto.setAssignedTrainer(entity.getAssignedTrainer() != null ? entity.getAssignedTrainer().getCuit() : null);
+        dto.setAssignedNutritionist(entity.getAssignedNutritionist() != null ? entity.getAssignedNutritionist().getCuit() : null);
         dto.setName(entity.getName());
         dto.setLastname(entity.getLastname());
         dto.setEmail(entity.getEmail());

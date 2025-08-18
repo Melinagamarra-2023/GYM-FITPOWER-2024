@@ -15,15 +15,15 @@ INSERT INTO users_roles (user_id, role_id) VALUES(1, 2), (2, 3), (3, 1), (4, 4);
 INSERT INTO trainers (cuit, name, lastname, email, phone_number, enabled) VALUES
 ('11111111111', 'trainer', 'trainer', 'trainer@trainer.com', '1111111111', TRUE);
 
-INSERT INTO clients (cuit, name, lastname, email, phone_number, enabled) VALUES
-('22222222222', 'client', 'client', 'client@client.com', '2222222222', TRUE);
-
 INSERT INTO nutritionists (cuit, name, lastname, email, phone_number, enabled) VALUES
 ('33333333333', 'nutri', 'nutri', 'nutri@nutri.com', '3333333333', TRUE);
 
 INSERT INTO gyms (address, domain, mail, phone, enabled) VALUES ('Calle 123', 'gimnasio1.com', 'gimnasio1@example', '1234567890', TRUE);
 INSERT INTO gyms (address, domain, mail, phone, enabled) VALUES ('Calle 456', 'gimnasio2.com', 'gimnasio2@example', '9876543210', TRUE);
 INSERT INTO gyms (address, domain, mail, phone, enabled) VALUES ('Calle 789', 'gimnasio3.com', 'gimnasio3@example', '5555555555', TRUE);
+
+INSERT INTO clients (birth_date,cuit, name, lastname, email, phone_number, enabled,assigned_gym_id,assigned_nutritionist_id)VALUES
+('2025-08-29','22222222222', 'client', 'client', 'client@client.com', '2222222222', TRUE,1,1);
 
 INSERT INTO exercises (name, description, muscle_group, enabled) VALUES
 ('Sentadillas', 'Ejercicio para fortalecer los músculos de las piernas', 'Piernas', TRUE),
