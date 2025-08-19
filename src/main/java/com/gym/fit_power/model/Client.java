@@ -25,13 +25,15 @@ public class Client {
     private String cuit;
 
     @ManyToOne
-//    @JoinColumn(nullable = false)
+    @JoinColumn(name = "assigned_gym_id")
     private Gym assignedGym;
 
     @ManyToOne
+    @JoinColumn(name = "assigned_trainer_id")
     private Trainer assignedTrainer;
 
     @ManyToOne
+    @JoinColumn(name = "assigned_nutritionist_id")
     private Nutritionist assignedNutritionist;
 
     @OneToMany(mappedBy = "client")

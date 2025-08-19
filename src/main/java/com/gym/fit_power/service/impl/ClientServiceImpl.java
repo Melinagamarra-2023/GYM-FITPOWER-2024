@@ -83,7 +83,16 @@ public class ClientServiceImpl implements ClientService {
         try {
             List<ClientDTO> response = new ArrayList<>();
             log.info("Searching all clients on the database");
-            for (Client client : clientRepository.findAll()) {
+            List<Client> allClients = clientRepository.findAllWithRelations();
+            log.info("Found {} clients in database", allClients.size());
+            
+            for (Client client : allClients) {
+                log.info("Processing client: {} - Gym: {}, Trainer: {}, Nutritionist: {}", 
+                    client.getCuit(),
+                    client.getAssignedGym() != null ? client.getAssignedGym().getAddress() : "null",
+                    client.getAssignedTrainer() != null ? client.getAssignedTrainer().getCuit() : "null",
+                    client.getAssignedNutritionist() != null ? client.getAssignedNutritionist().getCuit() : "null"
+                );
                 response.add(toDTO(client));
             }
             return response;
@@ -192,12 +201,22 @@ public class ClientServiceImpl implements ClientService {
         ClientDTO dto = new ClientDTO();
         dto.setCuit(entity.getCuit());
         dto.setAssignedGym(entity.getAssignedGym() != null ? entity.getAssignedGym().getAddress() : null);
+        dto.setAssignedTrainer(entity.getAssignedTrainer() != null ? entity.getAssignedTrainer().getCuit() : null);
+        dto.setAssignedNutritionist(entity.getAssignedNutritionist() != null ? entity.getAssignedNutritionist().getCuit() : null);
         dto.setName(entity.getName());
         dto.setLastname(entity.getLastname());
         dto.setEmail(entity.getEmail());
         dto.setPhone(entity.getPhone());
         dto.setBirthDate(entity.getBirthDate() != null ? entity.getBirthDate().toString() : null);
         dto.setEnabled(entity.isEnabled());
+        
+        log.info("DTO created for client {}: Gym={}, Trainer={}, Nutritionist={}", 
+            entity.getCuit(),
+            dto.getAssignedGym(),
+            dto.getAssignedTrainer(),
+            dto.getAssignedNutritionist()
+        );
+        
         return dto;
     }
 
