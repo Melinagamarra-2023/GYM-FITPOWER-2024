@@ -32,7 +32,7 @@
                     v-model="form.domain"
                     required
                   />
-                  <div class="invalid-feedback">Por favor ingrese un dominio.</div>
+                  <div class="invalid-feedback">Por favor ingrese un nombre.</div>
                 </div>
               </div>
 
@@ -93,7 +93,7 @@
                 <thead>
                   <tr>
                     <th>Dirección</th>
-                    <th>Dominio</th>
+                    <th>Nombre</th>
                     <th>Email</th>
                     <th>Teléfono</th>
                     <th>Estado</th>

@@ -16,7 +16,7 @@
             >
               <div class="row">
                 <div class="col-md-6 mb-3">
-                  <label for="cuit" class="form-label">CUIT *</label>
+                  <label for="cuit" class="form-label">CUIL *</label>
                   <input
                     type="text"
                     class="form-control"
@@ -29,7 +29,7 @@
                     :class="{ 'bg-light': isEdit }"
                   />
                   <div class="invalid-feedback">
-                    Por favor ingrese un CUIT válido (ej: 20-12345678-9).
+                    Por favor ingrese un CUIL válido (ej: 20-12345678-9).
                   </div>
                 </div>
 
@@ -247,7 +247,7 @@
               <table class="table table-hover align-middle">
                 <thead>
                   <tr>
-                    <th>CUIT</th>
+                    <th>CUIL</th>
                     <th>Nombre</th>
                     <th>Apellido</th>
                     <th>Email</th>
