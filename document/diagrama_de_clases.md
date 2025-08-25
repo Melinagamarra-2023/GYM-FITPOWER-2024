@@ -1,5 +1,6 @@
+```mermaid
 classDiagram
-direction LR
+    direction LR
 
     class Usuario {
         <<abstract>>
