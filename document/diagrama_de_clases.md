@@ -1,6 +1,6 @@
 ```mermaid
 classDiagram
-    direction LR
+    direction TD
 
     class Usuario {
         <<abstract>>
