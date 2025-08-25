@@ -1,15 +1,11 @@
 ```mermaid
 stateDiagram-v2
-direction LR
+    direction LR
 
     [*] --> Creado: Administrador crea el perfil
 
     Creado --> Activo: Se asignan planes y profesionales
-    note on link
-        El cliente puede empezar a
-        registrar sus actividades.
-    end note
-
+    
     Activo --> Suspendido: Se pausa la membresía (ej: por falta de pago, lesión)
     Suspendido --> Activo: Se reactiva la membresía
 
