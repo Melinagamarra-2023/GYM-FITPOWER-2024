@@ -2,110 +2,184 @@
 classDiagram
     direction TD
 
+    %% -------------------
+    %% --- Core Users ---
+    %% -------------------
     class Usuario {
         <<abstract>>
         +String cuit
-        +String name
-        +String lastname
+        +String firstName
+        +String lastName
         +String email
         +String phone
         +LocalDate createdAt
-        +Boolean enabled
+        +Boolean isActive
     }
 
-    class Client {
-        +LocalDate birthdate
+    class Cliente {
+        +LocalDate birthDate
         +String goals
-        +Float desiredWeight
     }
 
-    class Trainer {
+    class Entrenador {
         +String specialization
     }
 
-    class Nutritionist {
+    class Nutricionista {
         +String specialization
     }
 
-    class Gym {
+    class Gimnasio {
         +String address
-        +String domain
         +String email
         +String phone
-        +Boolean enabled
+        +Boolean isActive
     }
 
-    class Routine {
+    %% -------------------
+    %% --- Training ---
+    %% -------------------
+    class Rutina {
         +String name
         +String description
-        +LocalDate createdAt
+        +Boolean isTemplate
     }
 
-    class RoutineExercise {
-        +int reps
+    class RutinaEjercicio {
         +int sets
-        +int restInMinutes
+        +int reps
+        +int restTimeInSeconds
     }
 
-    class Exercise {
+    class Ejercicio {
         +String name
         +String description
         +String muscleGroup
     }
 
-    class NutritionPlan {
-        +LocalDate createdAt
-        +Float dailyCalories
-        +Float dailyCarbohydrates
-        +Float dailyProteins
-        +Float dailyFats
-    }
-
-    class TrainingDiary {
-        +LocalDateTime createdAt
-        +String commentary
-    }
-
-    class NutritionDiary {
-        +LocalDate updatedAt
-        +Float actualWeight
-        +String commentary
-    }
-
-    class Meal {
-        +MEALS mealType
+    %% -------------------
+    %% --- Nutrition ---
+    %% -------------------
+    class PlanNutricion {
+        +String name
         +String description
+        +Float targetDailyCalories
+        +Float targetDailyCarbs
+        +Float targetDailyProteins
+        +Float targetDailyFats
     }
 
-    class MEALS {
+    class Comida {
+        +TIPO_COMIDA mealType
+        +String description
+        +int estimatedCalories
+    }
+
+    class TIPO_COMIDA {
         <<enumeration>>
         BREAKFAST
         LUNCH
-        SNACKS
+        SNACK
         DINNER
     }
 
-    %% Herencia
-    Usuario <|-- Client
-    Usuario <|-- Trainer
-    Usuario <|-- Nutritionist
+    %% -------------------
+    %% --- Progress & Logging (Major Refinement) ---
+    %% -------------------
+    class PlanAsignado {
+        <<association>>
+        +LocalDate assignedAt
+        +Boolean isActive
+    }
 
-    %% Relaciones
-    Gym "1" -- "*" Client : "tiene"
-    Gym "1" -- "*" Trainer : "tiene"
-    Gym "1" -- "*" Nutritionist : "tiene"
+    class SesionEntrenamiento {
+        +LocalDateTime dateTime
+        +String clientComments
+    }
 
-    Client "1" -- "*" Routine : "tiene"
-    Trainer "1" -- "*" Routine : "crea"
+    class EjercicioRealizado {
+        +int performedSets
+        +int performedReps
+        +float weightUsed
+    }
 
-    Client "1" -- "*" NutritionPlan : "tiene"
-    Nutritionist "1" -- "*" NutritionPlan : "crea"
+    class RegistroComida {
+        +LocalDateTime dateTime
+        +String clientComments
+    }
 
-    Client "1" -- "*" TrainingDiary : "registra"
-    Client "1" -- "*" NutritionDiary : "registra"
+    class RegistroProgreso {
+        +LocalDate date
+        +float currentWeight
+        +String professionalNotes
+    }
 
-    Routine "1" -- "1..*" RoutineExercise : "compuesta por"
-    Exercise "1" -- "*" RoutineExercise : "incluido en"
+    %% -------------------
+    %% --- Missing Classes from User Stories ---
+    %% -------------------
+    class Notificacion {
+        +String message
+        +LocalDateTime sentAt
+        +Boolean isRead
+    }
 
-    NutritionDiary "1" -- "*" Meal : "contiene"
-    Meal "1" -- "1" MEALS : "es de tipo"
+    class ClaseGrupal {
+        +String name
+        +String description
+        +LocalDateTime startDateTime
+        +int durationInMinutes
+        +int maxCapacity
+    }
+
+    class Reserva {
+        +LocalDateTime bookingDate
+        +String status
+    }
+
+
+    %% ===================
+    %% === INHERITANCE ===
+    %% ===================
+    Usuario <|-- Cliente
+    Usuario <|-- Entrenador
+    Usuario <|-- Nutricionista
+
+
+    %% ===================
+    %% === RELATIONSHIPS ===
+    %% ===================
+
+    %% --- Gym & Users ---
+    Gimnasio "1" -- "*" Cliente : "pertenecen a"
+    Gimnasio "1" -- "*" Entrenador : "trabajan en"
+    Gimnasio "1" -- "*" Nutricionista : "trabajan en"
+
+    %% --- Plan Assignment (Key Change) ---
+    Cliente "1" -- "*" PlanAsignado : "tiene planes"
+    (Rutina, PlanNutricion) .. PlanAsignado
+    Entrenador "1" -- "*" Rutina : "crea"
+    Nutricionista "1" -- "*" PlanNutricion : "crea"
+
+    %% --- Routine Composition ---
+    Rutina "1" -- "1..*" RutinaEjercicio : "compuesta por"
+    Ejercicio "1" -- "*" RutinaEjercicio : "es parte de"
+
+    %% --- Nutrition Plan Composition ---
+    PlanNutricion "1" -- "1..*" Comida : "contiene"
+    Comida "1" -- "1" TIPO_COMIDA : "es de tipo"
+
+    %% --- Logging Progress (Key Change) ---
+    Cliente "1" -- "*" SesionEntrenamiento : "registra"
+    SesionEntrenamiento "1" -- "1..*" EjercicioRealizado : "incluye"
+    Ejercicio "1" -- "*" EjercicioRealizado : "se realiza"
+
+    Cliente "1" -- "*" RegistroComida : "registra"
+    Comida "1" -- "*" RegistroComida : "se consume en"
+
+    Cliente "1" -- "*" RegistroProgreso : "tiene"
+
+    %% --- Notifications & Bookings ---
+    Cliente "1" -- "*" Notificacion : "recibe"
+    Cliente "1" -- "*" Reserva : "realiza"
+    ClaseGrupal "1" -- "*" Reserva : "tiene"
+    Gimnasio "1" -- "*" ClaseGrupal : "ofrece"
