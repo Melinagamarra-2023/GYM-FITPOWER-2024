@@ -1,10 +1,5 @@
-# Diagrama de Clases - FITPOWER
-
-A continuación se presenta el diagrama de clases del sistema, modelado con Mermaid.
-
-```mermaid
 classDiagram
-    direction LR
+direction LR
 
     class Usuario {
         <<abstract>>
@@ -89,12 +84,12 @@ classDiagram
         DINNER
     }
 
-    ' Herencia
+    %% Herencia
     Usuario <|-- Client
     Usuario <|-- Trainer
     Usuario <|-- Nutritionist
 
-    ' Relaciones
+    %% Relaciones
     Gym "1" -- "*" Client : "tiene"
     Gym "1" -- "*" Trainer : "tiene"
     Gym "1" -- "*" Nutritionist : "tiene"
