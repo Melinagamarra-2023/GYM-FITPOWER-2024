@@ -156,7 +156,8 @@ classDiagram
 
     %% --- Plan Assignment (Key Change) ---
     Cliente "1" -- "*" PlanAsignado : "tiene planes"
-    (Rutina, PlanNutricion) .. PlanAsignado
+    Rutina .. PlanAsignado
+    PlanNutricion .. PlanAsignado
     Entrenador "1" -- "*" Rutina : "crea"
     Nutricionista "1" -- "*" PlanNutricion : "crea"
 
