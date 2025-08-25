@@ -36,24 +36,37 @@ Este documento detalla las especificaciones técnicas y contratos de API para la
   "estadoFisicoInicial": "Sobrepeso",
   "gimnasioAsignado": "Gimnasio Central"
 }
+```
+
+**Response (POST)**
+*Status Code: 201 CREATED*
+```json
+{
+  "idCliente": 1,
+  "nombre": "Juan",
+  "apellido": "Perez",
+  "dni": "40.000.000",
+  "email": "juan.perez@example.com",
+  "telefono": "+12-(376)-4345-6789",
+  "direccion": "calle falsa 123",
+  "objetivos": "Perder peso",
+  "estadoFisicoInicial": "Sobrepeso",
+  "gimnasioAsignado": "Gimnasio Central",
+  "fechaRegistro": "2024-08-26T10:00:00Z"
+}
+```
 
 ---
 ### User Story: manage-clients-crud-read
 
-**ESCENARIO 2:** Visualización de la información de un cliente.
-
-**DADO QUE** el administrador necesita consultar la información de un cliente por DNI
-**CUANDO** accede al perfil del cliente
-**ENTONCES** puede ver toda la información registrada del cliente.
-
-**VALIDACIÓN**
-- Autenticarse como administrador.
-- Acceder a la lista de clientes.
-- Seleccionar un cliente y visualizar su perfil completo.
-
-**Horas estimadas:** ?
+| | Horas estimadas |
+| :--- | :---: |
+| **ESCENARIO 2:** Visualización de la información de un cliente. | **?** |
+| **DADO QUE** el administrador necesita consultar la información de un cliente por DNI <br> **CUANDO** accede al perfil del cliente <br> **ENTONCES** puede ver toda la información registrada del cliente. | |
+| **VALIDACIÓN** <br> - Autenticarse como administrador. <br> - Acceder a la lista de clientes. <br> - Seleccionar un cliente y visualizar su perfil completo. | |
 
 ---
+
 #### Representación JSON
 
 **Response (GET)**
@@ -74,24 +87,19 @@ Este documento detalla las especificaciones técnicas y contratos de API para la
   "fechaRegistro": "2024-08-26T10:00:00Z",
   "fechaUltimaActualizacion": "2024-08-26T12:00:00Z"
 }
+```
 
 ---
 ### User Story: manage-clients-crud-update
 
-**ESCENARIO 3:** Actualización de la información de un cliente.
-
-**DADO QUE** el administrador necesita actualizar la información de un cliente
-**CUANDO** modifica los datos del cliente y guarda los cambios
-**ENTONCES** la información actualizada se refleja en el perfil del cliente.
-
-**VALIDACIÓN**
-- Autenticarse como administrador y acceder al perfil del cliente.
-- Modificar datos del cliente.
-- Guardar los cambios y confirmar que se actualizan correctamente.
-
-**Horas estimadas:** ?
+| | Horas estimadas |
+| :--- | :---: |
+| **ESCENARIO 3:** Actualización de la información de un cliente. | **?** |
+| **DADO QUE** el administrador necesita actualizar la información de un cliente <br> **CUANDO** modifica los datos del cliente y guarda los cambios <br> **ENTONCES** la información actualizada se refleja en el perfil del cliente. | |
+| **VALIDACIÓN** <br> - Autenticarse como administrador y acceder al perfil del cliente. <br> - Modificar datos del cliente. <br> - Guardar los cambios y confirmar que se actualizan correctamente. | |
 
 ---
+
 #### Representación JSON
 
 **Request (PUT)**
@@ -106,24 +114,38 @@ Este documento detalla las especificaciones técnicas y contratos de API para la
   "objetivos": "Ganar masa muscular",
   "gimnasioAsignado": "Gimnasio Norte"
 }
+```
+
+**Response (PUT)**
+*Status Code: 200 OK*
+```json
+{
+  "idCliente": 1,
+  "nombre": "Juan",
+  "apellido": "Perez",
+  "dni": "40.000.000",
+  "email": "juan.perez.nuevo@example.com",
+  "telefono": "+12-(376)-4111-2222",
+  "direccion": "calle verdadera 456",
+  "objetivos": "Ganar masa muscular",
+  "estadoFisicoInicial": "Sobrepeso",
+  "gimnasioAsignado": "Gimnasio Norte",
+  "fechaRegistro": "2024-08-26T10:00:00Z",
+  "fechaUltimaActualizacion": "2024-08-26T18:00:00Z"
+}
+```
 
 ---
 ### User Story: manage-clients-crud-delete
 
-**ESCENARIO 4:** Eliminación de un cliente.
-
-**DADO QUE** el administrador necesita eliminar un cliente del sistema
-**CUANDO** selecciona la opción de eliminar
-**ENTONCES** el cliente se elimina y ya no está disponible en la lista de clientes.
-
-**VALIDACIÓN**
-- Autenticarse como administrador y acceder a la lista de clientes.
-- Seleccionar un cliente y eliminarlo.
-- Confirmar que el cliente se elimina de la lista.
-
-**Horas estimadas:** ?
+| | Horas estimadas |
+| :--- | :---: |
+| **ESCENARIO 4:** Eliminación de un cliente. | **?** |
+| **DADO QUE** el administrador necesita eliminar un cliente del sistema <br> **CUANDO** selecciona la opción de eliminar <br> **ENTONCES** el cliente se elimina y ya no está disponible en la lista de clientes. | |
+| **VALIDACIÓN** <br> - Autenticarse como administrador y acceder a la lista de clientes. <br> - Seleccionar un cliente y eliminarlo. <br> - Confirmar que el cliente se elimina de la lista. | |
 
 ---
+
 ### Contratos referentes a la User Story
 
 | MÉTODO | URI | Descripción | Status Code |
@@ -133,4 +155,3 @@ Este documento detalla las especificaciones técnicas y contratos de API para la
 | **GET** | `/api/v1/clientes/{dni}` | Obtener la información de un cliente específico. Devuelve el perfil del cliente. | 200 OK, <br> 404 NOT FOUND |
 | **PUT** | `/api/v1/clientes/{dni}` | Actualiza un cliente existente. Devuelve el cliente actualizado. | 200 OK, <br> 400 BAD REQUEST, <br> 404 NOT FOUND |
 | **DELETE** | `/api/v1/clientes/{dni}` | Eliminar un cliente existente. | 204 NO CONTENT, <br> 404 NOT FOUND |
-

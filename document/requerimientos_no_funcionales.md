@@ -2,8 +2,6 @@
 
 Este documento describe los Requerimientos No Funcionales (RNF) para el sistema FITPOWER. Estos requerimientos definen los estándares de calidad, rendimiento y operación de la plataforma, asegurando una experiencia de usuario robusta y confiable.
 
----
-
 ### 1. Rendimiento (Performance)
 
 * **RNF-01: Tiempo de Respuesta de la Interfaz:** La aplicación debe ser ágil. Las acciones comunes del usuario (navegar entre pantallas, abrir un plan) no deben tardar más de **2 segundos** en cargar.

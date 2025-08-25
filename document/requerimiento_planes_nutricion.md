@@ -1,3 +1,15 @@
+# Requerimiento 1.3 - Gestión de Planes de Nutrición
+
+Este documento detalla las especificaciones técnicas y contratos de API para la gestión de Planes de Nutrición en el sistema FITPOWER.
+
+---
+### User Story: manage-nutrition-plans-crud
+
+| | Horas estimadas |
+| :--- | :---: |
+| **COMO** Nutricionista del gimnasio <br> **QUIERO** gestionar planes de nutrición para los clientes <br> **PARA** crear, visualizar, actualizar y eliminar planes de alimentación personalizados. | **?** |
+
+---
 ### User Story: manage-nutrition-plans-crud-create
 
 | | Horas estimadas |
@@ -35,6 +47,24 @@
     }
   ]
 }
+```
+
+**Response (POST)**
+*Status Code: 201 CREATED*
+```json
+{
+  "idPlan": 123,
+  "dniCliente": "40.000.000",
+  "nombrePlan": "Plan de Definición Muscular",
+  "descripcion": "Plan enfocado en la reducción de grasa corporal manteniendo la masa muscular.",
+  "caloriasDiariasObjetivo": 2200,
+  "carbosDiariosObjetivo": 180,
+  "protesDiariasObjetivo": 200,
+  "grasasDiariasObjetivo": 70,
+  "fechaAsignacion": "2024-08-26T10:00:00Z",
+  "activo": true
+}
+```
 
 ---
 ### User Story: manage-nutrition-plans-crud-read
@@ -87,6 +117,7 @@
     }
   ]
 }
+```
 
 ---
 ### User Story: manage-nutrition-plans-crud-update
@@ -134,6 +165,25 @@
     }
   ]
 }
+```
+
+**Response (PUT)**
+*Status Code: 200 OK*
+```json
+{
+  "idPlan": 123,
+  "dniCliente": "40.000.000",
+  "nombrePlan": "Plan de Definición Muscular v2",
+  "descripcion": "Plan ajustado para incrementar la ingesta calórica en días de entrenamiento intenso.",
+  "caloriasDiariasObjetivo": 2400,
+  "carbosDiariosObjetivo": 200,
+  "protesDiariasObjetivo": 220,
+  "grasasDiariasObjetivo": 80,
+  "fechaAsignacion": "2024-08-26T10:00:00Z",
+  "fechaUltimaActualizacion": "2024-09-15T14:30:00Z",
+  "activo": true
+}
+```
 
 ---
 ### User Story: manage-nutrition-plans-crud-delete
@@ -143,8 +193,6 @@
 | **ESCENARIO 4:** Eliminación (o desactivación) de un plan de nutrición. | **?** |
 | **DADO QUE** un plan de nutrición ya no es relevante o fue creado por error <br> **CUANDO** el nutricionista selecciona la opción de eliminar el plan <br> **ENTONCES** el plan se desactiva y ya no se muestra como el plan activo del cliente. | |
 | **VALIDACIÓN** <br> - Autenticarse como nutricionista y acceder al plan de nutrición de un cliente. <br> - Seleccionar la opción de eliminar. <br> - Confirmar que el plan ya no aparece como activo para el cliente (se puede verificar que el plan queda en el historial pero con estado "inactivo"). | |
-
-**Nota de Diseño:** En lugar de una eliminación física (`DELETE` de la base de datos), se recomienda una eliminación lógica (cambiar el estado a `activo: false`). Esto preserva el historial del cliente, lo cual es un requerimiento clave del sistema.
 
 ---
 
@@ -156,4 +204,3 @@
 | **GET** | `/api/v1/clientes/{dni}/planes-nutricion/activo` | Obtiene el plan de nutrición activo de un cliente específico. Devuelve el perfil completo del plan. | 200 OK, <br> 404 NOT FOUND |
 | **PUT** | `/api/v1/planes-nutricion/{idPlan}` | Actualiza un plan de nutrición existente. Devuelve el plan actualizado. | 200 OK, <br> 400 BAD REQUEST, <br> 404 NOT FOUND |
 | **DELETE** | `/api/v1/planes-nutricion/{idPlan}` | Realiza una eliminación lógica de un plan de nutrición (lo marca como inactivo). | 204 NO CONTENT, <br> 404 NOT FOUND |
-
