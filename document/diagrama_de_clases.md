@@ -8,10 +8,12 @@ classDiagram
     class Usuario {
         <<abstract>>
         +String cuit
+        +String dni
         +String firstName
         +String lastName
         +String email
         +String phone
+        +String address
         +LocalDate createdAt
         +Boolean isActive
     }
@@ -19,6 +21,7 @@ classDiagram
     class Cliente {
         +LocalDate birthDate
         +String goals
+        +String initialPhysicalState
     }
 
     class Entrenador {
