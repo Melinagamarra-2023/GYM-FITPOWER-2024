@@ -1,6 +1,9 @@
 services:
   app:
-    build: .
+    container_name: fitpower-app
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "8080:8080"
     environment:
@@ -11,6 +14,7 @@ services:
 
   db:
     image: mysql:8
+    container_name: fitpower-db
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: fitpower
