@@ -5,19 +5,22 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "8081:8081" # El puerto interno (derecha) debe coincidir con el server.port de la app
     environment:
-      SPRING_PROFILES_ACTIVE: prod
+      - SPRING_PROFILES_ACTIVE=prod
+    env_file:
+      - ./.env # Carga todas las variables del fichero .env
     depends_on:
-      - db
-      - kafka
+      db:
+        condition: service_healthy # Espera a que la BBDD esté saludable antes de iniciar la app
+      kafka:
+        condition: service_started
 
   db:
     image: mysql:8
     container_name: fitpower-db
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: fitpower
+    env_file:
+      - ./.env # Carga las variables para crear la BBDD y el usuario desde el .env
     ports:
       - "3306:3306"
     volumes:

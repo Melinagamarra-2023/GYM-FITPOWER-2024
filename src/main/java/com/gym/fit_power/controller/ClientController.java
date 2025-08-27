@@ -23,7 +23,7 @@ import static com.gym.fit_power.constant.ClientConstants.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/clients")
+@RequestMapping("api/v1/clients")
 @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 public class ClientController {
 

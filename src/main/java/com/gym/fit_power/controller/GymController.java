@@ -15,7 +15,7 @@ import static com.gym.fit_power.constant.GymConstants.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/V1/gyms")
+@RequestMapping("api/V1/gyms")
 @PreAuthorize("hasAnyRole('ADMIN')")
 public class GymController {
 

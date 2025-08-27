@@ -1,9 +1,14 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${DATABASE_URL}
-    username: ${LOCAL_DB_USER}
-    password: ${LOCAL_DB_PASSWORD}
+    url: ${DATABASE_URL} # Se define en el .env
+    username: ${MYSQL_USER} # Se define en el .env y lo usa la imagen de MySQL
+    password: ${MYSQL_PASSWORD} # Se define en el .env y lo usa la imagen de MySQL
+  kafka:
+    bootstrap-servers: kafka:29092 # Conexión al broker de Kafka dentro de la red de Docker
+  jpa:
+    hibernate:
+      ddl-auto: none
 
 server:
   port: 8081

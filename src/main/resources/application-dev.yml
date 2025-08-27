@@ -4,6 +4,9 @@ spring:
     url: jdbc:h2:mem:gestion_fitpower;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     username: ${LOCAL_DB_USER}
     password: ${LOCAL_DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: create-drop # Para desarrollo, crea el esquema al iniciar y lo borra al parar.
 
   h2:
     console:

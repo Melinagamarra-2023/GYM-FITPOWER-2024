@@ -21,12 +21,12 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/auth")
+@RequestMapping("/api/v1/auth")
 @Tag(name = "Authentication Controller", description = "Controller for user registration and login")
 public class AuthController {
     private final AuthService service;
 
-    @PostMapping("register")
+    @PostMapping("/register")
     @Operation(
             summary = "Registrar un nuevo usuario",
             description = "Permite a un nuevo usuario registrarse en el sistema proporcionando sus datos personales y credenciales.",
@@ -64,7 +64,7 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("message", "User registered successfully!"));
     }
 
-    @PostMapping("login")
+    @PostMapping("/login")
     @Operation(
             summary = "Iniciar sesión de un usuario",
             description = "Permite a un usuario existente iniciar sesión proporcionando su CUIT y contraseña para obtener un token de autenticación.",
