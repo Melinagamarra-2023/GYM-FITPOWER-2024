@@ -1,5 +1,7 @@
 package com.gym.fit_power.service.impl;
 
+import com.gym.fit_power.dto.event.TrainerCreatedEventDTO;
+import com.gym.fit_power.dto.event.TrainerUpdatedEventDTO;
 import com.gym.fit_power.dto.request.TrainerRequestDto;
 import com.gym.fit_power.dto.response.TrainerResponseDto;
 import com.gym.fit_power.exception.EntityNotFoundException;
@@ -7,23 +9,25 @@ import com.gym.fit_power.exception.EntitySaveException;
 import com.gym.fit_power.model.Trainer;
 import com.gym.fit_power.repository.TrainerRepository;
 import com.gym.fit_power.service.TrainerService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class TrainerServiceImpl implements TrainerService {
 
+    private static final String TRAINER_EVENTS_TOPIC = "trainer-events";
     private final TrainerRepository trainerRepository;
-    private final KafkaTemplate<String, String> kafkaTemplate;
-
-    public TrainerServiceImpl(TrainerRepository trainerRepository, KafkaTemplate<String, String> kafkaTemplate) {
-        this.trainerRepository = trainerRepository;
-        this.kafkaTemplate = kafkaTemplate;
-    }
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @Override
     @Transactional(readOnly = true)
@@ -53,8 +57,14 @@ public class TrainerServiceImpl implements TrainerService {
         Trainer newTrainer = this.toEntity(trainerRequestDto);
         newTrainer = trainerRepository.save(newTrainer);
 
-        //TODO: send message via kafka to trainer topic
-        this.kafkaTemplate.send("trainer-topic", newTrainer.getCuit());
+        TrainerCreatedEventDTO event = TrainerCreatedEventDTO.builder()
+                .name(newTrainer.getName())
+                .lastname(newTrainer.getLastname())
+                .cuit(newTrainer.getCuit())
+                .email(newTrainer.getEmail())
+                .build();
+
+        sendTrainerEvent(event);
 
         return this.toDto(newTrainer);
     }
@@ -71,6 +81,15 @@ public class TrainerServiceImpl implements TrainerService {
 
         trainerRepository.save(updatedTrainer);
 
+        TrainerUpdatedEventDTO event = TrainerUpdatedEventDTO.builder()
+                .name(updatedTrainer.getName())
+                .lastname(updatedTrainer.getLastname())
+                .cuit(updatedTrainer.getCuit())
+                .email(updatedTrainer.getEmail())
+                .build();
+
+        sendTrainerEvent(event);
+
         return this.toDto(updatedTrainer);
     }
 
@@ -81,6 +100,20 @@ public class TrainerServiceImpl implements TrainerService {
                 .orElseThrow(() -> new EntityNotFoundException("No trainer found with DNI " + cuit + " for deletion."));
         trainer.setEnabled(false);
         trainerRepository.save(trainer);
+    }
+
+    private void sendTrainerEvent(Object event) {
+        CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send(TRAINER_EVENTS_TOPIC, event);
+        future.whenComplete((result, ex) -> {
+            if (ex == null) {
+                log.info("Evento de trainer enviado con éxito al topic '{}', partición {}, con offset {}",
+                        result.getRecordMetadata().topic(),
+                        result.getRecordMetadata().partition(),
+                        result.getRecordMetadata().offset());
+            } else {
+                log.error("No se pudo enviar el evento de trainer a Kafka. Causa: {}", ex.getMessage());
+            }
+        });
     }
 
     private Trainer toEntity(TrainerRequestDto dto) {

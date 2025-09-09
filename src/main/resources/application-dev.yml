@@ -6,7 +6,14 @@ spring:
     password: ${LOCAL_DB_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: create-drop # Para desarrollo, crea el esquema al iniciar y lo borra al parar.
+      ddl-auto: update # Para desarrollo, crea el esquema al iniciar y lo borra al parar.
+
+  # Kafka Producer Configuration
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
   h2:
     console:
