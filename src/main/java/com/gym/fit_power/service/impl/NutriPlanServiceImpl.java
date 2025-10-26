@@ -1,7 +1,6 @@
 package com.gym.fit_power.service.impl;
 
-import com.gym.fit_power.dto.NutriPlanDTO;
-import com.gym.fit_power.exception.EntityNotFoundException;
+import com.gym.fit_power.dto.NutritionPlanDTO;
 import com.gym.fit_power.exception.EntitySaveException;
 import com.gym.fit_power.model.Client;
 import com.gym.fit_power.model.NutritionPlan;
@@ -9,7 +8,7 @@ import com.gym.fit_power.model.Nutritionist;
 import com.gym.fit_power.repository.ClientRepository;
 import com.gym.fit_power.repository.NutriRepository;
 import com.gym.fit_power.repository.NutritionPlanRepository;
-import com.gym.fit_power.service.NutriPlanService;
+import com.gym.fit_power.service.NutritionPlanService;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +26,7 @@ import static com.gym.fit_power.constant.NutritinistConstants.SUCCESSFUL;
 
 @Service
 @Slf4j
-public class NutriPlanServiceImpl implements NutriPlanService {
+public class NutriPlanServiceImpl implements NutritionPlanService {
 
     private final NutritionPlanRepository repository;
     private final NutriRepository nutriRepository;
@@ -43,8 +42,8 @@ public class NutriPlanServiceImpl implements NutriPlanService {
 
     @Override
     @Transactional
-    public NutriPlanDTO create(NutriPlanDTO request) {
-        NutriPlanDTO response = null;
+    public NutritionPlanDTO create(NutritionPlanDTO request) {
+        NutritionPlanDTO response = null;
         try {
             NutritionPlan nutritionPlan = toEntity(request);
             nutritionPlan.setLogNutri(new ArrayList<>());
@@ -63,21 +62,21 @@ public class NutriPlanServiceImpl implements NutriPlanService {
 
     @Override
     @Transactional
-    public NutriPlanDTO readOne(Long id) {
+    public NutritionPlanDTO readOne(Long id) {
         Optional<NutritionPlan> nutritionPlanOptional = repository.findById(id);
         NutritionPlan nutritionPlan = nutritionPlanOptional.orElseThrow();
         return toDTO(nutritionPlan);
     }
 
 
-    public List<NutriPlanDTO> readByClient(String clientCuit) {
+    public List<NutritionPlanDTO> readByClient(String clientCuit) {
         Client client = clientRepository.findByCuit(clientCuit);
         if (client.getPlans().isEmpty()) {
             logger.error(ERROR_NUTRIPLAN);
             return new ArrayList<>();
 
         }
-        List<NutriPlanDTO> responses = new ArrayList<>();
+        List<NutritionPlanDTO> responses = new ArrayList<>();
         for (NutritionPlan nt : repository.findAll()) {
             if (nt.getClient().getPlans().equals(client.getPlans())) {
                 responses = nt.getClient().getPlans().stream()
@@ -88,7 +87,7 @@ public class NutriPlanServiceImpl implements NutriPlanService {
         return responses;
     }
 
-    public NutriPlanDTO readPlanActiveByClient(String clientCuit) {
+    public NutritionPlanDTO readPlanActiveByClient(String clientCuit) {
         Client client = clientRepository.findByCuit(clientCuit);
         if (client.getPlans().isEmpty()) {
             logger.error(ERROR_NUTRIPLAN);
@@ -100,7 +99,7 @@ public class NutriPlanServiceImpl implements NutriPlanService {
                 .orElseThrow());
     }
 
-    public NutriPlanDTO readPlanByClient(String clientCuit, Long id) {
+    public NutritionPlanDTO readPlanByClient(String clientCuit, Long id) {
         Client client = clientRepository.findByCuit(clientCuit);
         if (client.getPlans().isEmpty()) {
             logger.error(ERROR_NUTRIPLAN);
@@ -113,7 +112,7 @@ public class NutriPlanServiceImpl implements NutriPlanService {
     }
 
 
-    private NutritionPlan toEntity(NutriPlanDTO request) {
+    private NutritionPlan toEntity(NutritionPlanDTO request) {
         NutritionPlan nutriP = new NutritionPlan();
         nutriP.setCreatedAt(LocalDate.now());
         nutriP.setDailyCalories(request.getDailyCalories());
@@ -138,8 +137,8 @@ public class NutriPlanServiceImpl implements NutriPlanService {
         return nutriP;
     }
 
-    private NutriPlanDTO toDTO(NutritionPlan nutritionPlan) {
-        NutriPlanDTO response = new NutriPlanDTO();
+    private NutritionPlanDTO toDTO(NutritionPlan nutritionPlan) {
+        NutritionPlanDTO response = new NutritionPlanDTO();
         response.setDailyProteins(nutritionPlan.getDailyProteins());
         response.setDailyCalories(nutritionPlan.getDailyCalories());
         response.setDailyCarbohydrates(nutritionPlan.getDailyCarbohydrates());

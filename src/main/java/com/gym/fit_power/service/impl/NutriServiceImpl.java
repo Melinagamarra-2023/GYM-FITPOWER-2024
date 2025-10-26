@@ -1,20 +1,19 @@
 package com.gym.fit_power.service.impl;
 
 
-import com.gym.fit_power.dto.request.RequestNutri;
+import com.gym.fit_power.dto.request.CreateNutriRequest;
 import com.gym.fit_power.dto.response.ResponseNutri;
 import com.gym.fit_power.exception.EntityNotFoundException;
 import com.gym.fit_power.exception.EntitySaveException;
 import com.gym.fit_power.model.Nutritionist;
 import com.gym.fit_power.repository.NutriRepository;
-import com.gym.fit_power.service.NutriService;
+import com.gym.fit_power.service.NutritionistService;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,7 +22,7 @@ import static com.gym.fit_power.constant.NutritinistConstants.*;
 
 @Service
 @Slf4j
-public class NutriServiceImpl implements NutriService {
+public class NutriServiceImpl implements NutritionistService {
     private final NutriRepository nutriRepository;
     protected static final Logger logger = LoggerFactory.getLogger(NutriServiceImpl.class);
 
@@ -36,7 +35,7 @@ public class NutriServiceImpl implements NutriService {
 
     @Override
     @Transactional
-    public ResponseNutri create(RequestNutri requestNutri) {
+    public ResponseNutri create(CreateNutriRequest requestNutri) {
         ResponseNutri response = null;
         try {
             response = toDTO(nutriRepository.save(toEntity(requestNutri)));
@@ -70,7 +69,7 @@ public class NutriServiceImpl implements NutriService {
 
     @Override
     @Transactional
-    public ResponseNutri update(Long id, RequestNutri requestNutri) {
+    public ResponseNutri update(Long id, CreateNutriRequest requestNutri) {
         Nutritionist nutriUpdate;
         Optional<Nutritionist>nutriOptional = nutriRepository.findById(id);
         Nutritionist nutri = nutriOptional.orElseThrow(()->{
@@ -122,7 +121,7 @@ public class NutriServiceImpl implements NutriService {
         return null;
     }
 
-    private Nutritionist toEntity(RequestNutri requestNutri) {
+    private Nutritionist toEntity(CreateNutriRequest requestNutri) {
         Nutritionist nutri = new Nutritionist();
         nutri.setName(requestNutri.getName());
         nutri.setLastname(requestNutri.getLastname());

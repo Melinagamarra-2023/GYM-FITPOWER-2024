@@ -2,7 +2,6 @@ package com.gym.fit_power.security.service;
 
 
 import com.gym.fit_power.dto.ClientDTO;
-import com.gym.fit_power.dto.request.RequestNutri;
 import com.gym.fit_power.dto.request.TrainerRequestDto;
 import com.gym.fit_power.exception.EntitySaveException;
 import com.gym.fit_power.security.dto.AuthResponse;
@@ -15,13 +14,12 @@ import com.gym.fit_power.security.repository.RoleRepository;
 import com.gym.fit_power.security.repository.UserRepository;
 
 import com.gym.fit_power.service.ClientService;
-import com.gym.fit_power.service.NutriService;
+import com.gym.fit_power.service.NutritionistService;
 import com.gym.fit_power.service.TrainerService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -40,7 +38,7 @@ public class AuthService {
     private final RoleRepository roleRepository;
 
     private final TrainerService trainerService;
-    private final NutriService nutriService;
+    private final NutritionistService nutriService;
     private final ClientService clientService;
 
     @Transactional // Ensures atomicity for user and profile creation

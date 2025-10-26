@@ -11,11 +11,8 @@ import org.springframework.http.*;
 
 import java.net.URISyntaxException;
 
-import com.gym.fit_power.dto.NutriPlanDTO;
-
 import com.gym.fit_power.dto.ClientDTO;
 import com.gym.fit_power.service.impl.*;
-import com.gym.fit_power.dto.NutritionDiaryDTO;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,16 +25,13 @@ import static com.gym.fit_power.constant.ClientConstants.*;
 public class ClientController {
 
     private final ClientServiceImpl clientService;
-    private final NutriPlanServiceImpl nutritionPlanService;
-    private final NutritionDiaryServiceImpl nutritionDiaryService;
+
 
     @Autowired
     public ClientController(ClientServiceImpl clientService,
                             NutriPlanServiceImpl nutritionPlanService,
                             NutritionDiaryServiceImpl nutritionDiaryService) {
         this.clientService = clientService;
-        this.nutritionPlanService = nutritionPlanService;
-        this.nutritionDiaryService = nutritionDiaryService;
     }
 
     // <<<<<<<<<<<<<<<<<<< CLIENTS >>>>>>>>>>>>>>>>>>> //
@@ -117,39 +111,5 @@ public class ClientController {
         return headers;
     }
 
-    @GetMapping("/{cuit}/nutrition_plans")
-    public ResponseEntity<List<NutriPlanDTO>> viewNutritionPlans(@PathVariable(value = "cuit") String clientCuit) {
-        return new ResponseEntity<>(nutritionPlanService.readByClient(clientCuit), HttpStatus.OK);
-    }
-
-    @GetMapping("/{cuit}/nutrition_plans/active")
-    public ResponseEntity<NutriPlanDTO> viewActivePlan(@PathVariable(value = "cuit") String clientCuit) {
-        return new ResponseEntity<>(nutritionPlanService.readPlanActiveByClient(clientCuit), HttpStatus.OK);
-    }
-
-    @GetMapping("/{cuit}/nutrition_plans/{id}")
-    public ResponseEntity<NutriPlanDTO> viewOnePlan(@PathVariable(value = "cuit") String clientCuit,
-                                                    @PathVariable(value = "id") Long id) {
-        return new ResponseEntity<>(nutritionPlanService.readPlanByClient(clientCuit, id), HttpStatus.OK);
-    }
-
-
-    @PutMapping("/{cuit}/nutrition_plans/active/diary")
-    public ResponseEntity<NutritionDiaryDTO> updateOrCreateNutritionDiary(
-            @PathVariable(value = "cuit") String clientCuit,
-            @RequestBody NutritionDiaryDTO request) {
-        return new ResponseEntity<>(nutritionDiaryService.update(clientCuit, request), HttpStatus.OK);
-    }
-
-    @GetMapping("/{cuit}/nutrition_plans/{id}/diary")
-    public ResponseEntity<List<NutritionDiaryDTO>> viewNutriPlanDiary(@PathVariable(value = "cuit") String clientCuit,
-                                                                      @PathVariable(value = "id") Long id) {
-        return new ResponseEntity<>(nutritionDiaryService.readByNutritionPlan(clientCuit, id), HttpStatus.OK);
-    }
-
-    @GetMapping("/{cuit}/nutrition_plans/active/diary")
-    public ResponseEntity<List<NutritionDiaryDTO>> viewActivePlanDiary(@PathVariable(value = "cuit") String clientCuit) {
-        return new ResponseEntity<>(nutritionDiaryService.readByClientActivePlan(clientCuit), HttpStatus.OK);
-    }
 
 }

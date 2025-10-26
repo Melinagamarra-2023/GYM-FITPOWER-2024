@@ -1,8 +1,8 @@
 package com.gym.fit_power.controller;
 
-import com.gym.fit_power.dto.request.RequestNutri;
+import com.gym.fit_power.dto.request.CreateNutriRequest;
 import com.gym.fit_power.dto.response.ResponseNutri;
-import com.gym.fit_power.service.NutriService;
+import com.gym.fit_power.service.NutritionistService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,16 +20,16 @@ import static com.gym.fit_power.constant.NutritinistConstants.*;
 @RequestMapping("api/v1/Nutritionist")
 public class NutritionistController {
 
-    private final NutriService service;
+    private final NutritionistService service;
     protected static final Logger logger = LoggerFactory.getLogger(NutritionistController.class);
 
-    public NutritionistController(NutriService service) {
+    public NutritionistController(NutritionistService service) {
         this.service = service;
     }
 
     @PostMapping("/save")
-    public ResponseEntity<ResponseNutri> saveNutritionist (@Valid @RequestBody RequestNutri requestNutri){
-        logger.info(CREATE +"{}", requestNutri.getId());
+    public ResponseEntity<ResponseNutri> saveNutritionist (@Valid @RequestBody CreateNutriRequest requestNutri){
+        logger.info(CREATE +"{}", requestNutri.getCuit());
         ResponseNutri response = service.create(requestNutri);
         return new ResponseEntity<>(response,HttpStatus.CREATED);
     }
@@ -53,12 +53,12 @@ public class NutritionistController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<ResponseNutri> updateNutritionist(@PathVariable Long id, @RequestBody RequestNutri requestNutri){
-        logger.info(UPDATE +"{} {}", id ,requestNutri.getName());
+    public ResponseEntity<ResponseNutri> updateNutritionist(@PathVariable Long id, @RequestBody CreateNutriRequest request){
+        logger.info(UPDATE +"{} {}", id ,request.getName());
         if (service.readOne(id) != null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        ResponseNutri response = service.update(id,requestNutri);
+        ResponseNutri response = service.update(id,request);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
