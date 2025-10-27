@@ -5,6 +5,7 @@ import com.gym.fit_power.dto.NutritionDiaryDTO;
 import com.gym.fit_power.service.NutritionPlanService;
 import com.gym.fit_power.service.NutritionDiaryService;
 import com.gym.fit_power.service.impl.NutriPlanServiceImpl;
+import com.gym.fit_power.util.DecodeUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -89,121 +90,276 @@ public class NutritionPlanController {
 
     // --------------------------------------------------------
     @Operation(
-            summary = "Obtener todos los planes nutricionales de un cliente",
-            description = "Devuelve una lista con todos los planes nutricionales asociados al cliente identificado por su CUIT.",
+            summary = "Obtener todos los planes nutricionales del cliente autenticado",
+            description = "Devuelve una lista con todos los planes nutricionales asociados al cliente identificado en el token JWT.",
             parameters = {
-                    @Parameter(name = "cuit", description = "CUIT del cliente", example = "20123456789")
+                    @Parameter(
+                            name = "Authorization",
+                            description = "Token JWT del cliente en formato 'Bearer <token>'",
+                            required = true,
+                            in = ParameterIn.HEADER,
+                            schema = @Schema(type = "string", example = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6...")
+                    )
             },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Lista de planes nutricionales encontrada",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = NutritionPlanDTO.class))),
-                    @ApiResponse(responseCode = "404", description = "Cliente no encontrado", content = @Content)
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Lista de planes nutricionales encontrada",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = NutritionPlanDTO.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Token inválido o expirado",
+                            content = @Content
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Cliente no encontrado",
+                            content = @Content
+                    )
             }
     )
-    @GetMapping("/{cuit}/nutrition_plans")
-    public ResponseEntity<List<NutritionPlanDTO>> viewNutritionPlans(@PathVariable(value = "cuit") String clientCuit) {
+    @GetMapping("/nutrition_plans")
+    public ResponseEntity<List<NutritionPlanDTO>> viewNutritionPlans(@RequestHeader String authorization) {
+        String clientCuit = DecodeUtil.extractCuitFromToken(authorization);
         return new ResponseEntity<>(service.readByClient(clientCuit), HttpStatus.OK);
     }
 
     // --------------------------------------------------------
     @Operation(
-            summary = "Obtener el plan nutricional activo de un cliente",
-            description = "Retorna el plan nutricional actualmente activo del cliente identificado por su CUIT.",
+            summary = "Obtener el plan nutricional activo del cliente autenticado",
+            description = "Retorna el plan nutricional actualmente activo del cliente identificado mediante el token JWT.",
             parameters = {
-                    @Parameter(name = "cuit", description = "CUIT del cliente", example = "20123456789")
+                    @Parameter(
+                            name = "Authorization",
+                            description = "Token JWT del cliente en formato 'Bearer <token>'",
+                            required = true,
+                            in = ParameterIn.HEADER,
+                            schema = @Schema(type = "string", example = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6...")
+                    )
             },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Plan nutricional activo encontrado",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = NutritionPlanDTO.class))),
-                    @ApiResponse(responseCode = "404", description = "No existe un plan activo o cliente no encontrado", content = @Content)
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Plan nutricional activo encontrado",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = NutritionPlanDTO.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Token inválido o expirado",
+                            content = @Content
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "No existe un plan activo o el cliente no fue encontrado",
+                            content = @Content
+                    )
             }
     )
-    @GetMapping("/{cuit}/nutrition_plans/active")
-    public ResponseEntity<NutritionPlanDTO> viewActivePlan(@PathVariable(value = "cuit") String clientCuit) {
+    @GetMapping("/nutrition_plans/active")
+    public ResponseEntity<NutritionPlanDTO> viewActivePlan(
+            @RequestHeader String authorization) {
+        String clientCuit = DecodeUtil.extractCuitFromToken(authorization);
         return new ResponseEntity<>(service.readPlanActiveByClient(clientCuit), HttpStatus.OK);
     }
 
     // --------------------------------------------------------
     @Operation(
-            summary = "Obtener un plan nutricional específico de un cliente",
-            description = "Permite consultar un plan nutricional específico mediante su ID para un cliente determinado.",
+            summary = "Obtener un plan nutricional específico del cliente autenticado",
+            description = "Devuelve un plan nutricional específico (por ID) del cliente autenticado identificado en el token JWT.",
             parameters = {
-                    @Parameter(name = "cuit", description = "CUIT del cliente", example = "20123456789"),
-                    @Parameter(name = "id", description = "ID del plan nutricional", example = "12")
+                    @Parameter(
+                            name = "Authorization",
+                            description = "Token JWT del cliente en formato 'Bearer <token>'",
+                            required = true,
+                            in = ParameterIn.HEADER,
+                            schema = @Schema(type = "string", example = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6...")
+                    ),
+                    @Parameter(
+                            name = "id",
+                            description = "ID del plan nutricional a consultar",
+                            required = true,
+                            in = ParameterIn.PATH,
+                            schema = @Schema(type = "integer", example = "5")
+                    )
             },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Plan nutricional encontrado",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = NutritionPlanDTO.class))),
-                    @ApiResponse(responseCode = "404", description = "Plan o cliente no encontrado", content = @Content)
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Plan nutricional encontrado",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = NutritionPlanDTO.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Token inválido o expirado",
+                            content = @Content
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Plan no encontrado o no pertenece al cliente autenticado",
+                            content = @Content
+                    )
             }
     )
-    @GetMapping("/{cuit}/nutrition_plans/{id}")
-    public ResponseEntity<NutritionPlanDTO> viewOnePlan(@PathVariable(value = "cuit") String clientCuit,
-                                                        @PathVariable(value = "id") Long id) {
+    @GetMapping("/nutrition_plans/{id}")
+    public ResponseEntity<NutritionPlanDTO> viewOnePlan(
+            @RequestHeader String authorization,
+            @PathVariable Long id) {
+        String clientCuit =  DecodeUtil.extractCuitFromToken(authorization);
         return new ResponseEntity<>(service.readPlanByClient(clientCuit, id), HttpStatus.OK);
     }
 
     // --------------------------------------------------------
     @Operation(
-            summary = "Actualizar o crear un diario nutricional para el plan activo",
-            description = "Permite crear o actualizar las entradas del diario nutricional asociado al plan activo del cliente.",
+            summary = "Crear o actualizar el diario nutricional del plan activo del cliente autenticado",
+            description = "Permite al cliente autenticado registrar o modificar las entradas de su diario nutricional asociado al plan activo. El CUIT se obtiene del token JWT.",
             parameters = {
-                    @Parameter(name = "cuit", description = "CUIT del cliente", example = "20123456789")
+                    @Parameter(
+                            name = "Authorization",
+                            description = "Token JWT del cliente en formato 'Bearer <token>'",
+                            required = true,
+                            in = ParameterIn.HEADER,
+                            schema = @Schema(type = "string", example = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6...")
+                    )
             },
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Datos del diario nutricional a crear o actualizar",
                     required = true,
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = NutritionDiaryDTO.class))
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = NutritionDiaryDTO.class)
+                    )
             ),
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Diario nutricional actualizado o creado correctamente",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = NutritionDiaryDTO.class))),
-                    @ApiResponse(responseCode = "400", description = "Datos inválidos o inconsistencia en la solicitud", content = @Content)
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Diario nutricional actualizado o creado correctamente",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = NutritionDiaryDTO.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Datos inválidos o inconsistencia en la solicitud",
+                            content = @Content
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Token inválido o expirado",
+                            content = @Content
+                    )
             }
     )
-    @PutMapping("/{cuit}/nutrition_plans/active/diary")
+    @PutMapping("/nutrition_plans/active/diary")
     public ResponseEntity<NutritionDiaryDTO> updateOrCreateNutritionDiary(
-            @PathVariable(value = "cuit") String clientCuit,
+            @RequestHeader String authorization,
             @RequestBody NutritionDiaryDTO request) {
+        String clientCuit = DecodeUtil.extractCuitFromToken(authorization);
         return new ResponseEntity<>(nutritionDiaryService.update(clientCuit, request), HttpStatus.OK);
     }
 
     // --------------------------------------------------------
     @Operation(
             summary = "Ver el diario nutricional de un plan específico",
-            description = "Devuelve todas las entradas del diario nutricional asociadas a un plan en particular del cliente.",
+            description = "Devuelve todas las entradas del diario nutricional asociadas a un plan en particular del cliente autenticado. El CUIT se obtiene del token JWT.",
             parameters = {
-                    @Parameter(name = "cuit", description = "CUIT del cliente", example = "20123456789"),
-                    @Parameter(name = "id", description = "ID del plan nutricional", example = "12")
+                    @Parameter(
+                            name = "Authorization",
+                            description = "Token JWT del cliente en formato 'Bearer <token>'",
+                            required = true,
+                            in = ParameterIn.HEADER,
+                            schema = @Schema(type = "string", example = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6...")
+                    ),
+                    @Parameter(
+                            name = "id",
+                            description = "ID del plan nutricional a consultar",
+                            required = true,
+                            in = ParameterIn.PATH,
+                            schema = @Schema(type = "integer", example = "12")
+                    )
             },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Entradas del diario encontradas",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = NutritionDiaryDTO.class))),
-                    @ApiResponse(responseCode = "404", description = "No se encontró el plan o el diario", content = @Content)
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Entradas del diario encontradas",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = NutritionDiaryDTO.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "No se encontró el plan o el diario",
+                            content = @Content
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Token inválido o expirado",
+                            content = @Content
+                    )
             }
     )
-    @GetMapping("/{cuit}/nutrition_plans/{id}/diary")
-    public ResponseEntity<List<NutritionDiaryDTO>> viewNutriPlanDiary(@PathVariable(value = "cuit") String clientCuit,
-                                                                      @PathVariable(value = "id") Long id) {
+    @GetMapping("/nutrition_plans/{id}/diary")
+    public ResponseEntity<List<NutritionDiaryDTO>> viewNutriPlanDiary(
+            @RequestHeader String authorization,
+            @PathVariable(value = "id") Long id) {
+
+        String clientCuit = DecodeUtil.extractCuitFromToken(authorization);
         return new ResponseEntity<>(nutritionDiaryService.readByNutritionPlan(clientCuit, id), HttpStatus.OK);
     }
+
 
     // --------------------------------------------------------
     @Operation(
             summary = "Ver el diario nutricional del plan activo",
-            description = "Retorna todas las entradas del diario asociadas al plan nutricional actualmente activo del cliente.",
+            description = "Retorna todas las entradas del diario asociadas al plan nutricional actualmente activo del cliente autenticado. El CUIT se obtiene del token JWT.",
             parameters = {
-                    @Parameter(name = "cuit", description = "CUIT del cliente", example = "20123456789")
+                    @Parameter(
+                            name = "Authorization",
+                            description = "Token JWT del cliente en formato 'Bearer <token>'",
+                            required = true,
+                            in = ParameterIn.HEADER,
+                            schema = @Schema(type = "string", example = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6...")
+                    )
             },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Entradas del diario del plan activo encontradas",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = NutritionDiaryDTO.class))),
-                    @ApiResponse(responseCode = "404", description = "Cliente o plan activo no encontrado", content = @Content)
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Entradas del diario del plan activo encontradas",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = NutritionDiaryDTO.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Cliente o plan activo no encontrado",
+                            content = @Content
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Token inválido o expirado",
+                            content = @Content
+                    )
             }
     )
-    @GetMapping("/{cuit}/nutrition_plans/active/diary")
-    public ResponseEntity<List<NutritionDiaryDTO>> viewActivePlanDiary(@PathVariable(value = "cuit") String clientCuit) {
+    @GetMapping("/nutrition_plans/active/diary")
+    public ResponseEntity<List<NutritionDiaryDTO>> viewActivePlanDiary(
+            @RequestHeader String authorization) {
+
+        String clientCuit = DecodeUtil.extractCuitFromToken(authorization);
         return new ResponseEntity<>(nutritionDiaryService.readByClientActivePlan(clientCuit), HttpStatus.OK);
     }
+
 
 }

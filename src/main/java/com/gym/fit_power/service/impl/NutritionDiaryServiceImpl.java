@@ -10,6 +10,8 @@ import com.gym.fit_power.repository.ClientRepository;
 import com.gym.fit_power.repository.NutritioDiaryRepository;
 import com.gym.fit_power.repository.NutritionPlanRepository;
 import com.gym.fit_power.service.NutritionDiaryService;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.gym.fit_power.constant.NutritinistConstants.*;
@@ -74,12 +77,12 @@ public class NutritionDiaryServiceImpl implements NutritionDiaryService {
                 .filter(nutritionPlan1 -> nutritionPlan1.getId().equals(id))
                 .findFirst()
                 .orElseThrow();
-        
-       return nutritionPlan.getLogNutri().stream()
+
+        return nutritionPlan.getLogNutri().stream()
                 .map(this::toDto)
                 .toList();
     }
-    
+
     @Override
     public List<NutritionDiaryDTO> readByClientActivePlan(String clientCuit) {
         Client client = clientRepository.findByCuit(clientCuit);
@@ -89,6 +92,26 @@ public class NutritionDiaryServiceImpl implements NutritionDiaryService {
                 .orElseThrow().getLogNutri().stream()
                 .map(this::toDto)
                 .toList();
+    }
+
+
+    public NutritionDiaryDTO createInitialDiary(String clientCuit) {
+        Client client = clientRepository.findByCuit(clientCuit);
+        NutritionPlan plan = client.getPlans().stream()
+                .filter(NutritionPlan::getEnabled)
+                .findFirst()
+                .orElseThrow();
+        NutritionDiary diary = new NutritionDiary();
+        diary.setCreatedAt(LocalDateTime.now());
+        diary.setBreakfast("");
+        diary.setDinner(" ");
+        diary.setLunch(" ");
+        diary.setSnacks("");
+        diary.setActualWeight(null);
+        diary.setCommentary("");
+        diary.setNutritionPlan(plan);
+
+        return toDto(repository.save(diary));
     }
 
     private NutritionDiary toEntity(NutritionDiaryDTO request) {
