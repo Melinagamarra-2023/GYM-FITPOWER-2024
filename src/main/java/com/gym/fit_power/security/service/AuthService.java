@@ -2,6 +2,7 @@ package com.gym.fit_power.security.service;
 
 
 import com.gym.fit_power.dto.ClientDTO;
+import com.gym.fit_power.dto.request.CreateNutriRequest;
 import com.gym.fit_power.dto.request.TrainerRequestDto;
 import com.gym.fit_power.exception.EntitySaveException;
 import com.gym.fit_power.security.dto.AuthResponse;
@@ -91,6 +92,9 @@ public class AuthService {
                     case USER:
                         createClientProfile(registerRequest);
                         break;
+                    case ADMIN:
+                            createAdminProfile (registerRequestt);
+                        break;
                     // Add cases for other roles if necessary
                     default:
                         // Optional: Log if a role is unhandled for profile creation,
@@ -116,7 +120,7 @@ public class AuthService {
     }
 
     private void createNutritionistProfile(RegisterRequest registerRequest) throws EntitySaveException {
-        RequestNutri nutriDto = new RequestNutri();
+        CreateNutriRequest nutriDto = new CreateNutriRequest();
         nutriDto.setCuit(registerRequest.getCuit());
         nutriDto.setName(registerRequest.getName());
         nutriDto.setLastname(registerRequest.getLastname());
@@ -135,6 +139,8 @@ public class AuthService {
         clientDto.setAssignedGym(registerRequest.getAssignedGym());
         clientService.create(clientDto);
     }
+
+
 
     public AuthResponse login(LoginRequest loginRequest) {
         authenticationManager.authenticate(

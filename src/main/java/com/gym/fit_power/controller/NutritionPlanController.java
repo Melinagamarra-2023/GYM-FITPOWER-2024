@@ -45,7 +45,7 @@ public class NutritionPlanController {
     }
 
     @PostMapping("/savePlan")
-    @PreAuthorize("hasAnyRole('ADMIN', 'NUTRITIONIST')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'NUTRITIONIST')")
     @Operation(
             summary = "Crear un plan de nutrición",
             description = "Permite a un usuario con rol **ADMIN** o **NUTRITIONIST** crear un nuevo plan nutricional para un cliente.",
